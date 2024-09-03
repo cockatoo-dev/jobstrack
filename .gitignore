@@ -1,3 +1,7 @@
+# Databases
+.drizzle
+*.db
+
 # Nuxt dev/build outputs
 .output
 .data
