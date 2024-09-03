@@ -10,7 +10,19 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@nuxt/eslint": "^0.5.5",
+    "@nuxt/ui": "^2.18.4",
+    "@nuxtjs/google-fonts": "^3.2.0",
+    "@vueuse/core": "^11.0.3",
+    "@vueuse/nuxt": "^11.0.3",
+    "better-sqlite3": "^9.6.0",
+    "drizzle-orm": "^0.33.0",
     "nuxt": "^3.13.0",
     "vue": "latest"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "drizzle-kit": "^0.24.2",
+    "eslint": "^9.9.1"
   }
 }
