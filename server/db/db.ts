@@ -64,33 +64,43 @@ export const createJobLegacy = async (
   username: string,
   companyName: string,
   jobTitle: string,
-  jobDescription: string
+  jobDescription: string,
+  lastUpdateName: string,
+  lastUpdateAction: string,
+  lastUpdateTime: number,
+  lastUpdateFlag: number
 ) => {
   db.insert(jobsLegacy).values({
-    id: crypto.randomUUID(),
+    jobId: crypto.randomUUID(),
     user: username,
     companyName,
     jobTitle,
-    jobDescription
+    jobDescription,
+    lastUpdateName,
+    lastUpdateAction,
+    lastUpdateTime,
+    lastUpdateFlag,
+    dismissRemind: false
   })
 }
 
-export const getJobByIdLegacy = async (id: string, username: string) => {
+export const getJobByIdLegacy = async (jobId: string, username: string) => {
   // Get a job and all associated updates
   return await db.select({
     companyName: jobsLegacy.companyName,
     jobTitle: jobsLegacy.jobTitle,
     jobDescription: jobsLegacy.jobDescription,
-    updateId: updatesLegacy.id,
+    dismissRemind: jobsLegacy.dismissRemind,
+    updateId: updatesLegacy.updateId,
     updateName: updatesLegacy.name,
     updateAction: updatesLegacy.action,
     updatesTime: updatesLegacy.time,
     updatesFlag: updatesLegacy.flag
   })
   .from(jobsLegacy)
-  .innerJoin(updatesLegacy, eq(updatesLegacy.job, jobsLegacy.id))
+  .innerJoin(updatesLegacy, eq(updatesLegacy.job, jobsLegacy.jobId))
   .where(and(
-    eq(jobsLegacy.id, id),
+    eq(jobsLegacy.jobId, jobId),
     eq(jobsLegacy.user, username)
   ))
   .orderBy(desc(updatesLegacy.time))
@@ -98,13 +108,13 @@ export const getJobByIdLegacy = async (id: string, username: string) => {
 
 export const getJobsByUserLegacy = async (username: string) => {
   // Count the number of jobs that a user has
-  const jobsCount = await db.select({num: count(jobsLegacy.id)})
+  const jobsCount = await db.select({num: count(jobsLegacy.jobId)})
   .from(jobsLegacy)
   .where(eq(jobsLegacy.user, username))
 
   // Get each job for the user and the latest update from each job
   return await db.select({
-    id: jobsLegacy.id,
+    jobId: jobsLegacy.jobId,
     companyName: jobsLegacy.companyName,
     jobTitle: jobsLegacy.jobTitle,
     action: updatesLegacy.action,
@@ -112,14 +122,14 @@ export const getJobsByUserLegacy = async (username: string) => {
     flag: updatesLegacy.flag
   })
   .from(jobsLegacy)
-  .innerJoin(updatesLegacy, eq(updatesLegacy.job, jobsLegacy.id))
+  .innerJoin(updatesLegacy, eq(updatesLegacy.job, jobsLegacy.jobId))
   .where(eq(jobsLegacy.user, username))
   .orderBy(asc(jobsLegacy.companyName), desc(updatesLegacy.time))
   .limit(jobsCount[0].num)
 }
 
 export const editJob = async (
-  id: string,
+  jobId: string,
   username: string,
   companyName: string,
   jobTitle: string,
@@ -131,7 +141,7 @@ export const editJob = async (
     jobDescription
   })
   .where(and(
-    eq(jobsLegacy.id, id),
+    eq(jobsLegacy.jobId, jobId),
     eq(jobsLegacy.user, username)
   ))
 }
@@ -144,7 +154,7 @@ export const addUpdateLegacy = async (
   flag: number
 ) => {
   await db.insert(updatesLegacy).values({
-    id: crypto.randomUUID(),
+    updateId: crypto.randomUUID(),
     job,
     name,
     action,
@@ -153,18 +163,28 @@ export const addUpdateLegacy = async (
   })
 }
 
+export const setDismissRemindLegacy = async (
+  username: string, 
+  jobId: string, 
+  dismissRemind: boolean) => {
+  await db.update(jobsLegacy).set({dismissRemind}).where(and(
+    eq(jobsLegacy.jobId, jobId),
+    eq(jobsLegacy.user, username)
+  ))
+}
+
 export const deleteUpdateLegacy = async (jobId: string, updateId: string) => {
   await db.delete(updatesLegacy).where(and(
     eq(updatesLegacy.job, jobId),
-    eq(updatesLegacy.id, updateId)
-  )).returning({del: updatesLegacy.id})
+    eq(updatesLegacy.updateId, updateId)
+  )).returning({del: updatesLegacy.updateId})
 }
 
 export const deleteJobLegacy = async (id: string, username: string) => {
   await db.delete(jobsLegacy).where(and(
-    eq(jobsLegacy.id, id),
+    eq(jobsLegacy.jobId, id),
     eq(jobsLegacy.user, username)
-  )).returning({del: jobsLegacy.id})
+  )).returning({del: jobsLegacy.jobId})
 }
 
 export const deleteUserLegacy = async (username: string, passwordHash: string) => {

@@ -8,16 +8,22 @@ export const usersLegacy = sqliteTable("usersLegacy", {
 })
 
 export const jobsLegacy = sqliteTable("jobsLegacy", {
-  id: text("id").primaryKey(),
+  jobId: text("id").primaryKey(),
   user: text("user").references(() => usersLegacy.username, {onDelete: 'cascade'}).notNull(),
   companyName: text("companyName").notNull(),
   jobTitle: text("jobTitle").notNull(),
-  jobDescription: text("jobDescriptions").notNull()
+  jobDescription: text("jobDescriptions").notNull(),
+  lastUpdateName: text("lastUpdateName").notNull(),
+  lastUpdateAction: text("lastUpdateAction").notNull(),
+  lastUpdateTime: int("lastUpdateTime").notNull(),
+  lastUpdateFlag: int("lastUpdateFlag").notNull(),
+  dismissRemind: int("dismissRemind", {mode: 'boolean'}).notNull()
+
 })
 
 export const updatesLegacy = sqliteTable("updatesLegacy", {
-  id: text("id").primaryKey(),
-  job: text("job").references(() => jobsLegacy.id, {onDelete: 'cascade'}).notNull(),
+  updateId: text("id").primaryKey(),
+  job: text("job").references(() => jobsLegacy.jobId, {onDelete: 'cascade'}).notNull(),
   name: text("name").notNull(),
   action: text("action").notNull(),
   time: int("time").notNull(),
