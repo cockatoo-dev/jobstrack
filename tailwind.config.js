@@ -1,4 +1,3 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
   theme: {
     fontFamily: {
@@ -6,7 +5,7 @@ module.exports = {
     },
     extend: {}
   },
-  plugins: [],
+  plugins: [require('tailwindcss-primeui')],
   content: [
     "./components/**/*.{js,vue,ts}",
     "./layouts/**/*.vue",
@@ -14,6 +13,5 @@ module.exports = {
     "./plugins/**/*.{js,ts}",
     "./nuxt.config.{js,ts}",
     "./app.vue",
-  ],
-  darkMode: 'class'
+  ]
 }

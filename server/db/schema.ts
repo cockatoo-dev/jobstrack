@@ -1,31 +1,27 @@
 import { sqliteTable, text, int } from "drizzle-orm/sqlite-core";
 
-export const usersLegacy = sqliteTable("usersLegacy", {
+export const usersBeta = sqliteTable("usersBeta", {
   username: text("username").primaryKey(),
   passwordHash: text('passwordHash').notNull(),
   remindDays: int("remindDays").notNull(),
   remindOfferDays: int("remindOfferDays").notNull()
 })
 
-export const jobsLegacy = sqliteTable("jobsLegacy", {
+export const jobsBeta = sqliteTable("jobsBeta", {
   jobId: text("id").primaryKey(),
-  user: text("user").references(() => usersLegacy.username, {onDelete: 'cascade'}).notNull(),
+  user: text("user").references(() => usersBeta.username, {onDelete: 'cascade'}).notNull(),
   companyName: text("companyName").notNull(),
   jobTitle: text("jobTitle").notNull(),
   jobDescription: text("jobDescriptions").notNull(),
-  lastUpdateName: text("lastUpdateName").notNull(),
-  lastUpdateAction: text("lastUpdateAction").notNull(),
+  lastUpdateType: int("lastUpdateType").notNull(),
   lastUpdateTime: int("lastUpdateTime").notNull(),
-  lastUpdateFlag: int("lastUpdateFlag").notNull(),
   dismissRemind: int("dismissRemind", {mode: 'boolean'}).notNull()
 
 })
 
-export const updatesLegacy = sqliteTable("updatesLegacy", {
+export const updatesBeta = sqliteTable("updatesBeta", {
   updateId: text("id").primaryKey(),
-  job: text("job").references(() => jobsLegacy.jobId, {onDelete: 'cascade'}).notNull(),
-  name: text("name").notNull(),
-  action: text("action").notNull(),
-  time: int("time").notNull(),
-  flag: int("flag").notNull()
+  job: text("job").references(() => jobsBeta.jobId, {onDelete: 'cascade'}).notNull(),
+  updateType: int("updateType").notNull(),
+  updateTime: int("updateTime").notNull()
 })
