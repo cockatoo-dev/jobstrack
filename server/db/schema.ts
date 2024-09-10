@@ -4,7 +4,8 @@ export const usersBeta = sqliteTable("usersBeta", {
   username: text("username").primaryKey(),
   passwordHash: text('passwordHash').notNull(),
   remindDays: int("remindDays").notNull(),
-  remindOfferDays: int("remindOfferDays").notNull()
+  remindOfferDays: int("remindOfferDays").notNull(),
+  demoMode: int("demoMode", {mode: "boolean"}).notNull()
 })
 
 export const jobsBeta = sqliteTable("jobsBeta", {
@@ -12,7 +13,7 @@ export const jobsBeta = sqliteTable("jobsBeta", {
   user: text("user").references(() => usersBeta.username, {onDelete: 'cascade'}).notNull(),
   companyName: text("companyName").notNull(),
   jobTitle: text("jobTitle").notNull(),
-  jobDescription: text("jobDescriptions").notNull(),
+  jobDescription: text("jobDescription").notNull(),
   lastUpdateType: int("lastUpdateType").notNull(),
   lastUpdateTime: int("lastUpdateTime").notNull(),
   dismissRemind: int("dismissRemind", {mode: 'boolean'}).notNull()

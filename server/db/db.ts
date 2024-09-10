@@ -14,11 +14,12 @@ export const createUserBeta = async (
   .where(eq(usersBeta.username, username))
 
   if (usernameMatch.length === 0) {
-    db.insert(usersBeta).values({
+    await db.insert(usersBeta).values({
       username, 
       passwordHash, 
       remindDays: 14, 
-      remindOfferDays: 3
+      remindOfferDays: 3,
+      demoMode: false
     })
     return true
   } else return false
@@ -49,13 +50,24 @@ export const changePasswordBeta = async (
   .where(eq(usersBeta.username, username))
 }
 
+export const checkUserExistsBeta = async (username: string) => {
+  const data = await db.select({username: usersBeta.username})
+  .from(usersBeta)
+  .where(eq(usersBeta.username, username))
+
+  return data.length === 1
+}
+
 export const getUserSettingsBeta = async (username: string) => {
-  return await db.select({
+  const data = await db.select({
     remindDays: usersBeta.remindDays,
-    remindOfferDays: usersBeta.remindOfferDays
+    remindOfferDays: usersBeta.remindOfferDays,
+    demoMode: usersBeta.demoMode
   })
   .from(usersBeta)
   .where(eq(usersBeta.username, username))
+  
+  return data[0]
 }
 
 export const editUserPasswordBeta = async (
@@ -66,9 +78,12 @@ export const editUserPasswordBeta = async (
 }
 
 export const editUserSettingsBeta = async (
-  username: string, remindDays: number, remindOfferDays: number
+  username: string, 
+  remindDays: number, 
+  remindOfferDays: number, 
+  demoMode: boolean
 ) => {
-  db.update(usersBeta).set({remindDays, remindOfferDays})
+  db.update(usersBeta).set({remindDays, remindOfferDays, demoMode})
   .where(eq(usersBeta.username, username))
 }
 
@@ -80,8 +95,9 @@ export const createJobBeta = async (
   lastUpdateType: updateTypes,
   lastUpdateTime: number
 ) => {
+  const jobId = crypto.randomUUID()
   db.insert(jobsBeta).values({
-    jobId: crypto.randomUUID(),
+    jobId,
     user: username,
     companyName,
     jobTitle,
@@ -90,6 +106,7 @@ export const createJobBeta = async (
     lastUpdateTime,
     dismissRemind: false
   })
+  return jobId
 }
 
 export const getJobByIdBeta = async (jobId: string, username: string) => {
@@ -117,6 +134,7 @@ export const getJobsByUserBeta = async (username: string) => {
     jobId: jobsBeta.jobId,
     companyName: jobsBeta.companyName,
     jobTitle: jobsBeta.jobTitle,
+    dismissRemind: jobsBeta.dismissRemind,
     lastUpdateType: jobsBeta.lastUpdateType,
     lastUpdateTime: jobsBeta.lastUpdateTime
   })
@@ -125,7 +143,7 @@ export const getJobsByUserBeta = async (username: string) => {
   .orderBy(asc(jobsBeta.companyName))
 }
 
-export const editJob = async (
+export const editJobBeta = async (
   jobId: string,
   username: string,
   companyName: string,
@@ -143,27 +161,33 @@ export const editJob = async (
   ))
 }
 
+export const setJobReminderBeta = async (
+  jobId: string, 
+  username: string, 
+  dismissRemind: boolean
+) => {
+  db.update(jobsBeta).set({
+   dismissRemind
+  })
+  .where(and(
+    eq(jobsBeta.jobId, jobId),
+    eq(jobsBeta.user, username)
+  ))
+}
+
 export const addUpdateBeta = async (
   job: string,
   updateType: updateTypes,
   updateTime: number
 ) => {
+  const updateId = crypto.randomUUID()
   await db.insert(updatesBeta).values({
-    updateId: crypto.randomUUID(),
+    updateId,
     job,
     updateType,
     updateTime
   })
-}
-
-export const setDismissRemindBeta = async (
-  username: string, 
-  jobId: string, 
-  dismissRemind: boolean) => {
-  await db.update(jobsBeta).set({dismissRemind}).where(and(
-    eq(jobsBeta.jobId, jobId),
-    eq(jobsBeta.user, username)
-  ))
+  return updateId
 }
 
 export const deleteUpdateBeta = async (jobId: string, updateId: string) => {

@@ -1,6 +1,6 @@
 import { z } from "zod"
-import { checkLoginBeta } from "../../db/db"
-import { createToken, hashPassword, TOKEN_COOKIE, TOKEN_EXPIRY } from "../../utils/utils"
+import { checkLoginBeta } from "../../../db/db"
+import { createToken, hashPassword, TOKEN_COOKIE, TOKEN_EXPIRY } from "../../../utils/utils"
 
 const bodySchema = z.object({
   uname: z.string(),
@@ -18,6 +18,7 @@ export default defineEventHandler(async (e) => {
   }
 
   const passHash = await hashPassword(bodyData.data.pass)
+
   if (await checkLoginBeta(bodyData.data.uname, passHash)) {
     setCookie(e, TOKEN_COOKIE, await createToken(bodyData.data.uname), {
       httpOnly: true,

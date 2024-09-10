@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { createUserBeta } from '../../db/db'
-import { createToken, hashPassword, TOKEN_COOKIE, TOKEN_EXPIRY } from '../../utils/utils'
+import { createUserBeta } from '../../../db/db'
+import { createToken, hashPassword, TOKEN_COOKIE, TOKEN_EXPIRY } from '../../../utils/utils'
 
 const bodySchema = z.object({
   uname: z.string(),
@@ -32,7 +32,7 @@ export default defineEventHandler(async (e) => {
       message: "Username unavailable. Please try a differnt username."
     })
   }
-
+  
   setCookie(e, TOKEN_COOKIE, await createToken(bodyData.data.uname), {
     httpOnly: true,
     maxAge: TOKEN_EXPIRY

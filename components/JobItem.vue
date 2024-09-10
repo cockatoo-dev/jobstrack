@@ -5,7 +5,6 @@ import { updateTypes } from '~/utils/utils';
     jobId: string,
     companyName: string,
     jobTitle: string,
-    updateId: string,
     updateType: updateTypes,
     updateTime: number,
     isFuture: boolean,
