@@ -27,6 +27,7 @@ export default defineEventHandler(async (e) => {
 
   let isFuture = false
   let isRemind = false
+  let hasOffer = false
 
   for (const job of dbJobs) {
     isFuture = false
@@ -61,6 +62,7 @@ export default defineEventHandler(async (e) => {
     ) {
       notConsideredJobs.push({...job, isFuture, isRemind})
     } else if (job.lastUpdateType === updateTypes.ACCEPT_OFFER) {
+      hasOffer = true
       acceptJobs.push({...job, isFuture, isRemind})
     } else if (job.lastUpdateType === updateTypes.RECEIVE_OFFER) {
       offerJobs.push({...job, isFuture, isRemind})
@@ -83,6 +85,7 @@ export default defineEventHandler(async (e) => {
   return {
     uname,
     ...settings,
+    hasOffer,
     allJobs,
     futureJobs,
     remindJobs,

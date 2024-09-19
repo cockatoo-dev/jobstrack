@@ -1,9 +1,18 @@
 <script lang="ts" setup>
-  import { updateTypes } from '#imports';
-
   const router = useRouter()
   
   const selectedView = ref("reminders")
+  const showAddJob = ref(false)
+
+  const job: dashboardJobItem = {
+    jobId: "1",
+    companyName: "Cockatoo Co.",
+    jobTitle: "Bird Photographer",
+    lastUpdateType: updateTypes.ASSESS_CENTER,
+    lastUpdateTime: Date.now(),
+    isRemind: false,
+    isFuture: false,
+  }
   const { data, error, status, refresh } = useFetch("/api/beta/dashboard")
   watch(status, () => {
     console.log("Fetch status updated!: ", status.value)
@@ -11,7 +20,6 @@
       router.push("/login")
     }
   })
-
 </script>
 
 <template>
@@ -19,27 +27,44 @@
     <LoggedInNavbar :refresh-data="refresh" />
     <div v-if="data && data.acceptJobs.length > 0">Congratulations!</div>
     <div v-else-if="data">Welcome back, {{ data.uname }}.</div>
+    <div>{{ showAddJob }}</div>
 
+    <AddJobModal 
+      v-model="showAddJob"
+      :refresh-data="refresh"
+    />
     <Tabs
       v-model:value="selectedView"
-      class="w-[19rem] sm:w-[38rem] lg:w-[57rem] 2xl:w-[76rem] mx-auto"
+      class="w-[20rem] sm:w-[40rem] lg:w-[60rem] 2xl:w-[80rem] mx-auto"
     >
-      <TabList>
-        <Tab value="reminders">Reminders</Tab>
-        <Tab value="stages">Stages</Tab>
-      </TabList>
+      <div class="grid grid-cols-[1fr_auto]">
+        <TabList>
+          <Tab value="reminders">Reminders</Tab>
+          <Tab value="stages">Stages</Tab>
+        </TabList>
+        <div>
+          <Button 
+            label="Add Job"
+            @click="() => showAddJob = true"
+          />
+        </div>
+      </div>
+      
       <TabPanels>
         <TabPanel value="reminders">
           Reminders view
+          <!-- <Accordion>
+            
+          </Accordion> -->
         </TabPanel>
         <TabPanel value="stages">
           Stages view
         </TabPanel>
       </TabPanels>
     </Tabs>
+    <DashboardList :jobs="[job]" :refresh-data="refresh" />
 
-    <div class="w-[19rem] sm:grid sm:grid-cols-2 sm:w-[38rem] lg:grid-cols-3 lg:w-[57rem] 2xl:grid-cols-4 2xl:w-[76rem] mx-auto">
-      <JobItem
+      <!-- <JobItem
         job-id="7"
         company-name="Pigeon Consulting"
         job-title="Migration Planning and Relocation Specialist"
@@ -173,9 +198,6 @@
         :update-time="new Date(2024,8,6).getTime()"
         :is-remind="false"
         :is-future="false"
-      />
-    </div>
-    
-    
+      /> -->
   </div>
 </template>

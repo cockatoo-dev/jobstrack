@@ -14,7 +14,7 @@ export const jobsBeta = sqliteTable("jobsBeta", {
   companyName: text("companyName").notNull(),
   jobTitle: text("jobTitle").notNull(),
   jobDescription: text("jobDescription").notNull(),
-  lastUpdateType: int("lastUpdateType").notNull(),
+  lastUpdateType: text("lastUpdateType").notNull(),
   lastUpdateTime: int("lastUpdateTime").notNull(),
   dismissRemind: int("dismissRemind", {mode: 'boolean'}).notNull()
 
@@ -23,6 +23,6 @@ export const jobsBeta = sqliteTable("jobsBeta", {
 export const updatesBeta = sqliteTable("updatesBeta", {
   updateId: text("id").primaryKey(),
   job: text("job").references(() => jobsBeta.jobId, {onDelete: 'cascade'}).notNull(),
-  updateType: int("updateType").notNull(),
+  updateType: text("updateType").notNull(),
   updateTime: int("updateTime").notNull()
 })

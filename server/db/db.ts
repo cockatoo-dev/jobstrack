@@ -92,7 +92,7 @@ export const createJobBeta = async (
   companyName: string,
   jobTitle: string,
   jobDescription: string,
-  lastUpdateType: updateTypes,
+  lastUpdateType: string,
   lastUpdateTime: number
 ) => {
   const jobId = crypto.randomUUID()
@@ -110,7 +110,6 @@ export const createJobBeta = async (
 }
 
 export const getJobByIdBeta = async (jobId: string, username: string) => {
-  // Get a job and all associated updates
   return await db.select({
     companyName: jobsBeta.companyName,
     jobTitle: jobsBeta.jobTitle,
@@ -177,7 +176,7 @@ export const setJobReminderBeta = async (
 
 export const addUpdateBeta = async (
   job: string,
-  updateType: updateTypes,
+  updateType: string,
   updateTime: number
 ) => {
   const updateId = crypto.randomUUID()

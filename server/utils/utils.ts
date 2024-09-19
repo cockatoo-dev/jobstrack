@@ -2,29 +2,47 @@ import * as jose from 'jose'
 import { JOSEError } from 'jose/errors'
 import { checkUserExistsBeta, getUserSettingsBeta } from '../db/db'
 
-export enum updateTypes {
-  NO_APPLICATION, 
-  APPLICATION_SENT, 
-  ONLINE_ASSESS, 
-  INTERVIEW,
-  PHONE_INTERVIEW,
-  VIRTUAL_INTERVIEW, 
-  TECH_INTERVIEW, 
-  BEHAVE_INTERVIEW,
-  FINAL_INTERVIEW,
-  ASSESS_CENTER,
-  RECEIVE_OFFER,
-  ACCEPT_OFFER,
-  DECLINE_OFFER,
-  REJECT,
-  WAITLIST
+// export enum updateTypes {
+//   NO_APPLICATION, 
+//   APPLICATION_SENT, 
+//   ONLINE_ASSESS, 
+//   INTERVIEW,
+//   PHONE_INTERVIEW,
+//   VIRTUAL_INTERVIEW, 
+//   TECH_INTERVIEW, 
+//   BEHAVE_INTERVIEW,
+//   FINAL_INTERVIEW,
+//   ASSESS_CENTER,
+//   RECEIVE_OFFER,
+//   ACCEPT_OFFER,
+//   DECLINE_OFFER,
+//   REJECT,
+//   WAITLIST
+// }
+
+export const updateTypes = {
+  NO_APPLICATION: "No Application",
+  APPLICATION_SENT: "Sent Application",
+  ONLINE_ASSESS: "Online Assessment",
+  INTERVIEW: "Interview",
+  PHONE_INTERVIEW: "Phone Interview",
+  VIRTUAL_INTERVIEW: "Virtual Interview",
+  TECH_INTERVIEW: "Technical Interview",
+  BEHAVE_INTERVIEW: "Behaviourla Interview",
+  FINAL_INTERVIEW: "Final Interview",
+  ASSESS_CENTER: "Assessment Center",
+  RECEIVE_OFFER: "Received Offer",
+  ACCEPT_OFFER: "Accepted Offer",
+  DECLINE_OFFER: "Declined Offer",
+  REJECT: "Rejected",
+  WAITLIST: "Placed on Waitlist"
 }
 
 export type dashboardJobItem = {
   jobId: string,
   companyName: string,
   jobTitle: string,
-  lastUpdateType: updateTypes,
+  lastUpdateType: string,
   lastUpdateTime: number,
   isFuture: boolean,
   isRemind: boolean
@@ -32,7 +50,7 @@ export type dashboardJobItem = {
 
 export type updateItem = {
   updateId: string,
-  updateType: updateTypes
+  updateType: string,
   updateTime: number
 }
 

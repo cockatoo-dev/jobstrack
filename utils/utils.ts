@@ -154,22 +154,14 @@ export type clientUpdate = {
   updateTime: number
 }
 
-export type clientJob = {
+export type dashboardJobItem = {
   jobId: string,
   companyName: string,
   jobTitle: string,
-  jobDescription: string,
-  lastUpdateText: string,
-  displayFlag: number
-  updates: [clientUpdate]
-}
-
-export type clientJobItem = {
-  jobId: string,
-  companyName: string,
-  jobTitle: string,
-  lastUpdateText: string,
-  displayFlag: number
+  lastUpdateType: updateTypes,
+  lastUpdateTime: number,
+  isFuture: boolean,
+  isRemind: boolean
 }
 
 export type clientUserSettings = {
