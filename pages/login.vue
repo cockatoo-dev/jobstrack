@@ -75,23 +75,36 @@
         </TabList>
         <TabPanels>
           <TabPanel value="login">
-            <h2 class="py-4 text-2xl ">Log in to an existing account</h2>
+            <h2 class="py-4 text-2xl font-bold">Log in to an existing account.</h2>
             <form @submit.prevent="submitLogin">
-              <label class="block" for="login-username">Username</label>
-              <div class="pb-2">
+              <div class="pb-4">
+                <label 
+                  for="login-username"
+                  class="block pb-1 text-slate-800 dark:text-slate-200"
+                >
+                  Username
+                </label>
                 <InputText 
                   id="login-username" 
                   v-model="loginUname" 
+                  class="block"
                 />
               </div>
-              <label class="block" for="login-password">Password</label>
-              <div class="pb-2">
+              <div class="pb-4">
+                <label 
+                  for="login-password"
+                  class="block pb-1 text-slate-800 dark:text-slate-200"
+                >
+                  Password
+                </label>
                 <Password
-                  id="login-password"
-                  v-model="loginPass"
+                  id="login-password" 
+                  v-model="loginPass" 
+                  class="block"
                   :feedback="false"
                 />
               </div>
+
               <div class="pt-2">
                 <Button 
                   type="submit"
@@ -105,27 +118,47 @@
           <TabPanel value="create">
             <h2 class="py-4 text-2xl">Create a new account</h2>
             <form @submit.prevent="submitCreate">
-              <div class="pb-2">
-                <label class="block" for="create-username">Username</label>
+              <div class="pb-4">
+                <label 
+                  for="create-username"
+                  class="block pb-1 text-slate-800 dark:text-slate-200"
+                >
+                  Username
+                </label>
                 <InputText 
                   id="create-username" 
                   v-model="createUname" 
+                  class="block"
+                  required
                 />
               </div>
-              <label class="block" for="create-password">Password</label>
-              <div class="pb-2">
+              <div class="pb-4">
+                <label 
+                  for="create-password"
+                  class="block pb-1 text-slate-800 dark:text-slate-200"
+                >
+                  Password
+                </label>
                 <Password
-                  id="create-password"
-                  v-model="createPass"
-                  :feedback="true"
+                  id="create-password" 
+                  v-model="createPass" 
+                  class="block"
+                  required
                 />
               </div>
-              <label class="block" for="confirm-password">Confirm Password</label>
-              <div class="pb-2">
+              <div class="pb-4">
+                <label 
+                  for="confirm-password"
+                  class="block pb-1 text-slate-800 dark:text-slate-200"
+                >
+                  Password
+                </label>
                 <Password
-                  id="confirm-password"
-                  v-model="confirmPass"
+                  id="confirm-password" 
+                  v-model="confirmPass" 
+                  class="block"
                   :feedback="false"
+                  required
                 />
               </div>
               <div class="pt-2">

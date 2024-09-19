@@ -40,13 +40,13 @@
           </div>
           <div class="pb-4">
             <label 
-              for="addCompanyName"
+              for="add-companyName"
               class="block pb-1 text-slate-800 dark:text-slate-200"
             >
               Company Name*
             </label>
             <InputText
-              id="addCompanyName"
+              id="add-companyName"
               v-model="companyName"
               class="block w-full"
               required
@@ -54,13 +54,13 @@
           </div>
           <div class="pb-4">
             <label 
-              for="addJobTitle"
+              for="add-jobTitle"
               class="block pb-1 text-slate-800 dark:text-slate-200"
             >
               Job Title*
             </label>
             <InputText
-              id="addJobTitle"
+              id="add-jobTitle"
               v-model="jobTitle"
               class="block w-full"
               required
@@ -68,7 +68,7 @@
           </div>
           <div class="pb-4">
             <label 
-              for="addJobDescription"
+              for="add-jobDescription"
               class="block pb-1 text-slate-800 dark:text-slate-200"
             >
               <div>Job Description</div>
@@ -77,7 +77,7 @@
               </div>
             </label>
             <Textarea
-              id="addJobDescription"
+              id="add-jobDescription"
               v-model="jobDescription"
               class="block w-full"
               rows="5"
@@ -86,13 +86,18 @@
           <div class="pt-2 pb-4 flex gap-2">
             <div>
               <Checkbox 
-                id="addJobHasApplied"
+                id="add-hasApplied"
                 v-model="hasApplied"
                 binary
               />
             </div>
             <div>
-              <label>Job Application Sent</label>
+              <label
+                for="add-hasApplied"
+                class="text-slate-800 dark:text-slate-200"
+              >
+                Job Application Sent
+              </label>
             </div>
           </div>
           <div class="pt-2 flex gap-2">
