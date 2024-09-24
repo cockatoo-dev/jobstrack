@@ -1,3 +1,45 @@
+
+
+// export enum updateTypes {
+//   NO_APPLICATION, 
+//   APPLICATION_SENT, 
+//   ONLINE_ASSESS, 
+//   INTERVIEW,
+//   PHONE_INTERVIEW,
+//   VIRTUAL_INTERVIEW, 
+//   TECH_INTERVIEW, 
+//   BEHAVE_INTERVIEW,
+//   FINAL_INTERVIEW,
+//   ASSESS_CENTER,
+//   RECEIVE_OFFER,
+//   ACCEPT_OFFER,
+//   DECLINE_OFFER,
+//   REJECT,
+//   WAITLIST
+// }
+
+export const updateTypes = {
+  NO_APPLICATION: "No Application",
+  APPLICATION_SENT: "Sent Application",
+  ONLINE_ASSESS: "Online Assessment",
+  INTERVIEW: "Interview",
+  PHONE_INTERVIEW: "Phone Interview",
+  VIRTUAL_INTERVIEW: "Virtual Interview",
+  TECH_INTERVIEW: "Technical Interview",
+  BEHAVE_INTERVIEW: "Behaviourla Interview",
+  FINAL_INTERVIEW: "Final Interview",
+  ASSESS_CENTER: "Assessment Center",
+  RECEIVE_OFFER: "Received Offer",
+  ACCEPT_OFFER: "Accepted Offer",
+  DECLINE_OFFER: "Declined Offer",
+  REJECT: "Rejected",
+  WAITLIST: "Placed on Waitlist"
+}
+
+export const dayTimestamp = () => {
+  return new Date(new Date().toDateString()).getTime()
+}
+
 export const timeToDaysString = (time: number) => {
   const DAY = 86400000
   
@@ -33,57 +75,7 @@ export const timeToDaysString = (time: number) => {
   }
 }
 
-export enum updateTypes {
-  NO_APPLICATION, 
-  APPLICATION_SENT, 
-  ONLINE_ASSESS, 
-  INTERVIEW,
-  PHONE_INTERVIEW,
-  VIRTUAL_INTERVIEW, 
-  TECH_INTERVIEW, 
-  BEHAVE_INTERVIEW,
-  FINAL_INTERVIEW,
-  ASSESS_CENTER,
-  RECEIVE_OFFER,
-  ACCEPT_OFFER,
-  DECLINE_OFFER,
-  REJECT,
-  WAITLIST
-}
-
-export const getUpdateName = (updateType: updateTypes) => {
-  if (updateType === updateTypes.APPLICATION_SENT) {
-    return "Sent Application"
-  } else if (updateType === updateTypes.ONLINE_ASSESS) {
-    return "Online Assessment"
-  } else if (updateType === updateTypes.INTERVIEW) {
-    return "Interview"
-  } else if (updateType === updateTypes.PHONE_INTERVIEW) {
-    return "Phone Interview"
-  }else if (updateType === updateTypes.VIRTUAL_INTERVIEW) {
-    return "Virtual Interview"
-  } else if (updateType === updateTypes.TECH_INTERVIEW) {
-    return "Technical Interview"
-  } else if (updateType === updateTypes.BEHAVE_INTERVIEW) {
-    return "Behavioural Interview"
-  } else if (updateType === updateTypes.FINAL_INTERVIEW) {
-    return "Final Interview"
-  } else if (updateType === updateTypes.ASSESS_CENTER) {
-    return "Assessment Center"
-  } else if (updateType === updateTypes.RECEIVE_OFFER) {
-    return "Received Offer"
-  } else if (updateType === updateTypes.ACCEPT_OFFER) {
-    return "Accepted Offer"
-  } else if (updateType === updateTypes.DECLINE_OFFER) {
-    return "Declined Offer"
-  } else if (updateType === updateTypes.REJECT) {
-    return "Rejected"
-  } else if (updateType === updateTypes.WAITLIST) {
-    return "Placed on Waitlist"
-  } else return ""
-}
-
-export const getUpdateAction = (updateType: updateTypes, time: number) => {
+export const getUpdateAction = (updateType: string, time: number) => {
   let daysString = ""
   if (updateType !== updateTypes.NO_APPLICATION) {
     daysString = timeToDaysString(time)
@@ -158,7 +150,7 @@ export type dashboardJobItem = {
   jobId: string,
   companyName: string,
   jobTitle: string,
-  lastUpdateType: updateTypes,
+  lastUpdateType: string,
   lastUpdateTime: number,
   isFuture: boolean,
   isRemind: boolean

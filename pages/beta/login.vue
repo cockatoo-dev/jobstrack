@@ -1,17 +1,19 @@
 <script setup lang="ts">
   import { FetchError } from "ofetch"
   
-  const router = useRouter()
   const loginUname = ref("")
   const loginPass = ref("")
   const createUname = ref("")
   const createPass = ref("")
   const confirmPass = ref("")
+  const loginLoading = ref(false)
+  const createLoading = ref(false)
   const loginError = ref("")
   const createError = ref("")
 
   const submitLogin = async () => {
-    console.log("Log In")
+    loginError.value = ""
+    loginLoading.value = true
     try {
       await $fetch("/api/beta/auth/login", {
         method: "post",
@@ -20,15 +22,19 @@
           pass: loginPass.value
         }
       })
-      router.push("/dashboard")
+      await navigateTo("/beta/dashboard")
     } catch (e) {
-     if (e instanceof FetchError) {
-      loginError.value = e.data.message
-     }
+      loginLoading.value = false
+      if (e instanceof FetchError) {
+        loginError.value = e.data.message
+      } else {
+        throw e
+      }
     }
   }
   const submitCreate = async () => {
-    console.log("Create Account")
+    createError.value = ""
+    createLoading.value = false
     try {
       await $fetch("/api/beta/auth/createAccount", {
         method: "post",
@@ -38,8 +44,9 @@
           confirmPass: confirmPass.value
         }
       })
-      router.push("/dashboard")
+      await navigateTo("/beta/dashboard")
     } catch (e) {
+      createLoading.value = false
       if (e instanceof FetchError) {
         createError.value = e.data.message
       } else {
@@ -52,7 +59,7 @@
     try {
       const result = await $fetch("/api/beta/auth/tokenCheck", {method: "get"})
       if (result) {
-        router.push("/dashboard")
+        await navigateTo("/beta/dashboard")
       }
     } catch {
       return
@@ -73,6 +80,7 @@
           <Tab value="login">Log In</Tab>
           <Tab value="create">Create Account</Tab>
         </TabList>
+
         <TabPanels>
           <TabPanel value="login">
             <h2 class="py-4 text-2xl font-bold">Log in to an existing account.</h2>
@@ -88,6 +96,7 @@
                   id="login-username" 
                   v-model="loginUname" 
                   class="block"
+                  fluid
                 />
               </div>
               <div class="pb-4">
@@ -101,23 +110,34 @@
                   id="login-password" 
                   v-model="loginPass" 
                   class="block"
+                  toggle-mask
                   :feedback="false"
+                  fluid
                 />
               </div>
 
-              <div class="pt-2">
+              <div class="py-2">
                 <Button 
                   type="submit"
+                  :loading="loginLoading"
+                  fluid
                 >
                   Log In
                 </Button>
+                <div class="pt-1 text-center text-sm text-slate-800 dark:text-slate-200">
+                  When you log in, a cookie will be saved to your device which stores information used to access your account. No other cookies are used by this site.
+                </div>
               </div>
-              <div>{{ loginError }}</div>
+              <FormError :message="loginError" />
             </form>
           </TabPanel>
+
           <TabPanel value="create">
-            <h2 class="py-4 text-2xl">Create a new account</h2>
+            <h2 class="py-4 text-2xl font-bold">Create a new account.</h2>
             <form @submit.prevent="submitCreate">
+              <div class="pb-2 text-sm text-slate-800 dark:text-slate-200">
+                All fields are required.
+              </div>
               <div class="pb-4">
                 <label 
                   for="create-username"
@@ -129,6 +149,7 @@
                   id="create-username" 
                   v-model="createUname" 
                   class="block"
+                  fluid
                   required
                 />
               </div>
@@ -143,6 +164,8 @@
                   id="create-password" 
                   v-model="createPass" 
                   class="block"
+                  toggle-mask
+                  fluid
                   required
                 />
               </div>
@@ -151,23 +174,30 @@
                   for="confirm-password"
                   class="block pb-1 text-slate-800 dark:text-slate-200"
                 >
-                  Password
+                  Confirm Password
                 </label>
                 <Password
                   id="confirm-password" 
                   v-model="confirmPass" 
-                  class="block"
                   :feedback="false"
+                  class="block"
+                  fluid
                   required
                 />
               </div>
-              <div class="pt-2">
+              <div class="py-2">
                 <Button 
                   type="submit"
+                  :loading="createLoading"
+                  fluid
                 >
-                  Log In
+                  Create Account
                 </Button>
+                <div class="pt-1 text-center text-sm text-slate-800 dark:text-slate-200">
+                  When you create an account, a cookie will be saved to your device which stores information used to access your account. No other cookies are used by this site.
+                </div>
               </div>
+              <FormError :message="createError" />
             </form>
           </TabPanel>
         </TabPanels>

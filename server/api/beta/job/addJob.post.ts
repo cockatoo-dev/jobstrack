@@ -11,16 +11,29 @@ const bodySchema = z.object({
 
 export default defineEventHandler(async (e) => {
   const bodyData = await readValidatedBody(e, body => bodySchema.safeParse(body))
-  if (bodyData.error) {
+  if (!bodyData.success) {
     throw createError({
       status: 400,
       message: "Invalid data types."
+    })
+  }
+
+  if (
+    bodyData.data.companyName === "" || 
+    bodyData.data.jobTitle === "" ||
+    (!Number.isInteger(bodyData.data.dayTimestamp))
+  ) {
+    throw createError({
+      status: 400,
+      message: "Some required fields are empty,"
     })
   }
   
   const uname = await checkToken(getCookie(e, TOKEN_COOKIE))
   const time = await processTime(bodyData.data.dayTimestamp, uname)
   let jobId: string = ""
+
+  console.log(uname)
   
   if (bodyData.data.hasApplied) {
     jobId = await createJobBeta(
@@ -31,6 +44,7 @@ export default defineEventHandler(async (e) => {
       updateTypes.APPLICATION_SENT,
       time
     )
+    console.log(jobId)
     await addUpdateBeta(
       jobId,
       updateTypes.APPLICATION_SENT,

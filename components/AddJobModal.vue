@@ -1,13 +1,21 @@
 <script setup lang="ts">
+  import { FetchError } from 'ofetch'
+  import { dayTimestamp } from '~/utils/utils'
+
   const isVisible = defineModel<boolean>()
   const props = defineProps<{
+    beta: boolean
     refreshData: () => Promise<void>
   }>()
+
+  const router = useRouter()
 
   const companyName = ref("")
   const jobTitle = ref("")
   const jobDescription = ref("")
   const hasApplied = ref(false)
+  const formLoading = ref(false)
+  const errorMessage = ref("")
 
   watch(isVisible, () => {
     if (!isVisible.value) {
@@ -15,11 +23,39 @@
       jobTitle.value = ""
       jobDescription.value = ""
       hasApplied.value = false
+      errorMessage.value = ""
     }
   })
   
   const submitForm = async () => {
-    
+    formLoading.value = true
+    try {
+      await $fetch("/api/beta/job/addJob", {
+        method: "post",
+        body: {
+          companyName: companyName.value,
+          jobTitle: jobTitle.value,
+          jobDescription: jobDescription.value,
+          hasApplied: hasApplied.value,
+          dayTimestamp: dayTimestamp()
+        }
+      })
+
+      await props.refreshData()
+      formLoading.value = false
+      isVisible.value = false
+    } catch (e) {
+      formLoading.value = false
+      if (e instanceof FetchError) {
+        if (e.status === 401) {
+          router.push("/login")
+        } else if (e.status === 400) {
+          errorMessage.value = e.data.message
+        } else {
+          throw e
+        }
+      }
+    }
   }
 
 </script>
@@ -32,7 +68,7 @@
     header="Add Job"
   >
     <template #container>
-      <div class="p-4 sm:p-8">
+      <div class="p-4 sm:p-8 overflow-auto">
         <h2 class="text-slate-800 dark:text-slate-200 text-3xl font-bold">Add a new job.</h2>
         <form @submit.prevent="submitForm">
           <div class="pb-2 text-sm text-slate-800 dark:text-slate-200">
@@ -86,8 +122,8 @@
           <div class="pt-2 pb-4 flex gap-2">
             <div>
               <Checkbox 
-                id="add-hasApplied"
                 v-model="hasApplied"
+                input-id="add-hasApplied"
                 binary
               />
             </div>
@@ -100,12 +136,12 @@
               </label>
             </div>
           </div>
-          <div class="pt-2 flex gap-2">
+          <div class="py-2 flex gap-2">
             <Button 
               type="submit"
               label="Add Job"
               class="block"
-              @click="submitForm"
+              :loading="formLoading"
             />
             <Button 
               type="button"
@@ -115,6 +151,7 @@
               @click="() => isVisible = false"
             />
           </div>
+          <FormError :message="errorMessage" />
         </form>
       </div>
     </template>

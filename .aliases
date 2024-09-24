@@ -1,4 +1,0 @@
-alias prepare='npx nuxt prepare'
-alias dev='npx nuxt dev'
-alias preview='npx nuxt build && npx nuxt preview'
-alias updatedb='npx drizzle-kit generate && npx drizzle-kit migrate'

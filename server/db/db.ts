@@ -73,7 +73,7 @@ export const getUserSettingsBeta = async (username: string) => {
 export const editUserPasswordBeta = async (
   username: string, passwordHash: string
 ) => {
-  db.update(usersBeta).set({passwordHash})
+  await db.update(usersBeta).set({passwordHash})
   .where(eq(usersBeta.username, username))
 }
 
@@ -83,7 +83,7 @@ export const editUserSettingsBeta = async (
   remindOfferDays: number, 
   demoMode: boolean
 ) => {
-  db.update(usersBeta).set({remindDays, remindOfferDays, demoMode})
+  await db.update(usersBeta).set({remindDays, remindOfferDays, demoMode})
   .where(eq(usersBeta.username, username))
 }
 
@@ -96,7 +96,7 @@ export const createJobBeta = async (
   lastUpdateTime: number
 ) => {
   const jobId = crypto.randomUUID()
-  db.insert(jobsBeta).values({
+  await db.insert(jobsBeta).values({
     jobId,
     user: username,
     companyName,
@@ -149,7 +149,7 @@ export const editJobBeta = async (
   jobTitle: string,
   jobDescription: string
 ) => {
-  db.update(jobsBeta).set({
+  await db.update(jobsBeta).set({
     companyName,
     jobTitle,
     jobDescription
@@ -165,7 +165,7 @@ export const setJobReminderBeta = async (
   username: string, 
   dismissRemind: boolean
 ) => {
-  db.update(jobsBeta).set({
+  await db.update(jobsBeta).set({
    dismissRemind
   })
   .where(and(

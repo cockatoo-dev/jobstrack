@@ -18,6 +18,17 @@ export default defineEventHandler(async (e) => {
     })
   }
 
+  if (
+    bodyData.data.uname === "" ||
+    bodyData.data.pass === "" ||
+    bodyData.data.confirmPass === ""
+  ) {
+    throw createError({
+      status: 400,
+      message:"Some required fields are empty."
+    })
+  }
+
   if (bodyData.data.pass !== bodyData.data.confirmPass) {
     throw createError({
       status: 400,

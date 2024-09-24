@@ -54,7 +54,7 @@ export type updateItem = {
   updateTime: number
 }
 
-export const TOKEN_COOKIE = "jobsTrackToken"
+export const TOKEN_COOKIE = "JobsTrackAuth"
 export const TOKEN_EXPIRY = 604700
 
 const jwtSecret = new TextEncoder().encode(process.env.JOBSTRACK_JWT)
@@ -70,7 +70,7 @@ export const createToken = async (uname: string) => {
 export const checkToken = async (token: string | undefined) => {
   if (!token) {
     throw createError({
-      status: 401,
+      status: 403,
       message: "No token provided. Please log in again."
     })
   }
@@ -81,7 +81,7 @@ export const checkToken = async (token: string | undefined) => {
       return payload.jobsTrackUname as string
     } else {
       throw createError({
-        status: 401,
+        status: 403,
         message: "Invalid token. Please log out and log in again."
       })
     }

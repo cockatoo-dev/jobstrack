@@ -2,6 +2,7 @@
   import { updateTypes } from '#imports';
   
   const props = defineProps<{
+    beta: boolean
     jobData: dashboardJobItem
     refreshData: () => Promise<void>
   }>()
@@ -21,13 +22,13 @@
 <template>
   <div class="p-2">
     <div
-      class="w-72 h-56 border-4 rounded-lg drop-shadow-md transition-colors duration-300"
+      class="w-full max-w-64 sm:w-64 h-56 border-4 rounded-lg drop-shadow-md transition-colors duration-300"
       :class="(
         jobData.lastUpdateType === updateTypes.ACCEPT_OFFER ? 'border-lime-500 hover:bg-lime-100 dark:hover:bg-lime-900' : 
         jobData.lastUpdateType === updateTypes.RECEIVE_OFFER ? 'border-fuchsia-500 hover:bg-fuchsia-100 dark:hover:bg-fuchsia-900' : 'border-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900'
       )"
     >
-      <NuxtLink to="/job">
+      <NuxtLink :to="`${beta ? '/beta' : ''}/job/${props.jobData.jobId}`">
         <div class="w-full h-36 rounded-t p-2">
           <h2 
             class="pb-1 text-3xl font-bold line-clamp-2 overflow-ellipsis"
@@ -45,14 +46,14 @@
       </NuxtLink>
       <NuxtLink
         v-if="jobData.lastUpdateType === updateTypes.ACCEPT_OFFER"
-        to="/job"
+        :to="`${beta ? '/beta' : ''}/job/${props.jobData.jobId}`"
         class="block w-full h-[4.5rem] rounded-b p-2 bg-lime-300 dark:bg-lime-700 border-t-2 border-t-lime-300 dark:border-t-lime-700 text-slate-800 dark:text-slate-200 text-center font-bold"
       >
         {{ updateText }}
       </NuxtLink>
       <NuxtLink 
         v-else-if="jobData.isFuture"
-        to="/job"
+        :to="`${beta ? '/beta' : ''}/job/${props.jobData.jobId}`"
         class="block w-full h-[4.5rem] rounded-b p-2 bg-yellow-300 dark:bg-yellow-700 border-t-2 border-t-yellow-300 dark:border-t-yellow-700 text-slate-800 dark:text-slate-200 font-bold text-center"
       >
         {{ updateText }}
@@ -77,7 +78,7 @@
 
       <NuxtLink 
         v-else
-        to="/job"
+        :to="`${beta ? '/beta' : ''}/job/${props.jobData.jobId}`"
         class="block w-full h-[4.5rem] rounded-b p-2 border-t-2 border-t-slate-500 text-center"
         :class="notConsidered ? 'text-slate-500' : 'text-slate-800 dark:text-slate-200'"
       >
