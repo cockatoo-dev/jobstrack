@@ -1,6 +1,6 @@
 import { z } from "zod"
-import { getJobByIdBeta } from "~/server/db/db"
-import type { updateItem } from "~/server/utils/utils"
+import { getJobById } from "~/server/db/db"
+import { checkBetaToken, type updateItem } from "~/server/utils/utils"
 
 const querySchema = z.object({
   jobId: z.string()
@@ -15,9 +15,9 @@ export default defineEventHandler(async (e) => {
     })
   }
 
-  const uname = await checkToken(getCookie(e, TOKEN_COOKIE))
+  const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
 
-  const dbData = await getJobByIdBeta(queryData.data.jobId, uname)
+  const dbData = await getJobById(queryData.data.jobId, userId)
   if (dbData.length === 0) {
     throw createError({
       status: 400,

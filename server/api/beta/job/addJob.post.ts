@@ -1,5 +1,6 @@
 import { z } from "zod"
-import { addUpdateBeta, createJobBeta } from "~/server/db/db"
+import { addUpdate, createJob } from "~/server/db/db"
+import { checkBetaToken } from "~/server/utils/utils"
 
 const bodySchema = z.object({
   companyName: z.string(),
@@ -29,29 +30,29 @@ export default defineEventHandler(async (e) => {
     })
   }
   
-  const uname = await checkToken(getCookie(e, TOKEN_COOKIE))
-  const time = await processTime(bodyData.data.dayTimestamp, uname)
-  let jobId: string = ""
+  const uname = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
+  // const time = await processTime(bodyData.data.dayTimestamp, uname)
+  let jobId = ""
 
   console.log(uname)
   
   if (bodyData.data.hasApplied) {
-    jobId = await createJobBeta(
+    jobId = await createJob(
       uname,
       bodyData.data.companyName,
       bodyData.data.jobTitle,
       bodyData.data.jobDescription,
       updateTypes.APPLICATION_SENT,
-      time
+      bodyData.data.dayTimestamp
     )
     console.log(jobId)
-    await addUpdateBeta(
+    await addUpdate(
       jobId,
       updateTypes.APPLICATION_SENT,
-      time
+      bodyData.data.dayTimestamp
     )
   } else {
-    jobId = await createJobBeta(
+    jobId = await createJob(
       uname,
       bodyData.data.companyName,
       bodyData.data.jobTitle,

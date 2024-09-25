@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 import Database from 'better-sqlite3'
-import { jobsBeta, updatesBeta, usersBeta } from './schema'
+import { jobs, updates, usersBeta, usersInfo } from './schema'
 import { and, asc, desc, eq } from 'drizzle-orm'
 
 const sqlite = new Database(process.cwd() + '/localDB.db')
@@ -14,12 +14,18 @@ export const createUserBeta = async (
   .where(eq(usersBeta.username, username))
 
   if (usernameMatch.length === 0) {
+    const userId = crypto.randomUUID()
+    await db.insert(usersInfo).values({
+      userId,
+      username,
+      remindDays: 14,
+      remindOfferDays: 3
+    })
     await db.insert(usersBeta).values({
       username, 
-      passwordHash, 
-      remindDays: 14, 
-      remindOfferDays: 3,
-      demoMode: false
+      passwordHash,
+      passwordUpdateTime: Math.floor(Date.now() / 1000),
+      userId
     })
     return true
   } else return false
@@ -50,22 +56,36 @@ export const changePasswordBeta = async (
   .where(eq(usersBeta.username, username))
 }
 
-export const checkUserExistsBeta = async (username: string) => {
-  const data = await db.select({username: usersBeta.username})
-  .from(usersBeta)
-  .where(eq(usersBeta.username, username))
-
-  return data.length === 1
-}
-
-export const getUserSettingsBeta = async (username: string) => {
+export const getUserIdBeta = async (username: string) => {
   const data = await db.select({
-    remindDays: usersBeta.remindDays,
-    remindOfferDays: usersBeta.remindOfferDays,
-    demoMode: usersBeta.demoMode
+    userId: usersBeta.userId,
+    passwordUpdateTime: usersBeta.passwordUpdateTime
   })
   .from(usersBeta)
   .where(eq(usersBeta.username, username))
+
+  if (data.length === 1) {
+    return {
+      exists: true,
+      userId: data[0].userId,
+      passwordUpdateTime: data[0].passwordUpdateTime
+    }
+  } else {
+    return {
+      exists: false,
+      userId: "",
+      passwordUpdateTime: NaN
+    }
+  }
+}
+
+export const getUserSettingsBeta = async (userId: string) => {
+  const data = await db.select({
+    remindDays: usersInfo.remindDays,
+    remindOfferDays: usersInfo.remindOfferDays
+  })
+  .from(usersInfo)
+  .where(eq(usersInfo.userId, userId))
   
   return data[0]
 }
@@ -77,18 +97,17 @@ export const editUserPasswordBeta = async (
   .where(eq(usersBeta.username, username))
 }
 
-export const editUserSettingsBeta = async (
-  username: string, 
+export const editUserSettings = async (
+  userId: string,
   remindDays: number, 
-  remindOfferDays: number, 
-  demoMode: boolean
+  remindOfferDays: number
 ) => {
-  await db.update(usersBeta).set({remindDays, remindOfferDays, demoMode})
-  .where(eq(usersBeta.username, username))
+  await db.update(usersInfo).set({remindDays, remindOfferDays})
+  .where(eq(usersInfo.userId, userId))
 }
 
-export const createJobBeta = async (
-  username: string,
+export const createJob = async (
+  userId: string,
   companyName: string,
   jobTitle: string,
   jobDescription: string,
@@ -96,9 +115,9 @@ export const createJobBeta = async (
   lastUpdateTime: number
 ) => {
   const jobId = crypto.randomUUID()
-  await db.insert(jobsBeta).values({
+  await db.insert(jobs).values({
     jobId,
-    user: username,
+    userId,
     companyName,
     jobTitle,
     jobDescription,
@@ -109,80 +128,80 @@ export const createJobBeta = async (
   return jobId
 }
 
-export const getJobByIdBeta = async (jobId: string, username: string) => {
+export const getJobById = async (jobId: string, userId: string) => {
   return await db.select({
-    companyName: jobsBeta.companyName,
-    jobTitle: jobsBeta.jobTitle,
-    jobDescription: jobsBeta.jobDescription,
-    dismissRemind: jobsBeta.dismissRemind,
-    updateId: updatesBeta.updateId,
-    updateType: updatesBeta.updateType,
-    updateTime: updatesBeta.updateTime
+    companyName: jobs.companyName,
+    jobTitle: jobs.jobTitle,
+    jobDescription: jobs.jobDescription,
+    dismissRemind: jobs.dismissRemind,
+    updateId: updates.updateId,
+    updateType: updates.updateType,
+    updateTime: updates.updateTime
   })
-  .from(jobsBeta)
-  .innerJoin(updatesBeta, eq(updatesBeta.job, jobsBeta.jobId))
+  .from(jobs)
+  .innerJoin(updates, eq(updates.jobId, jobs.jobId))
   .where(and(
-    eq(jobsBeta.jobId, jobId),
-    eq(jobsBeta.user, username)
+    eq(jobs.jobId, jobId),
+    eq(jobs.userId, userId)
   ))
-  .orderBy(desc(updatesBeta.updateTime))
+  .orderBy(desc(updates.updateTime))
 }
 
-export const getJobsByUserBeta = async (username: string) => {
+export const getJobsByUser = async (userId: string) => {
   return await db.select({
-    jobId: jobsBeta.jobId,
-    companyName: jobsBeta.companyName,
-    jobTitle: jobsBeta.jobTitle,
-    dismissRemind: jobsBeta.dismissRemind,
-    lastUpdateType: jobsBeta.lastUpdateType,
-    lastUpdateTime: jobsBeta.lastUpdateTime
+    jobId: jobs.jobId,
+    companyName: jobs.companyName,
+    jobTitle: jobs.jobTitle,
+    dismissRemind: jobs.dismissRemind,
+    lastUpdateType: jobs.lastUpdateType,
+    lastUpdateTime: jobs.lastUpdateTime
   })
-  .from(jobsBeta)
-  .where(eq(jobsBeta.user, username))
-  .orderBy(asc(jobsBeta.companyName))
+  .from(jobs)
+  .where(eq(jobs.userId, userId))
+  .orderBy(asc(jobs.companyName))
 }
 
-export const editJobBeta = async (
+export const editJob = async (
   jobId: string,
-  username: string,
+  userId: string,
   companyName: string,
   jobTitle: string,
   jobDescription: string
 ) => {
-  await db.update(jobsBeta).set({
+  await db.update(jobs).set({
     companyName,
     jobTitle,
     jobDescription
   })
   .where(and(
-    eq(jobsBeta.jobId, jobId),
-    eq(jobsBeta.user, username)
+    eq(jobs.jobId, jobId),
+    eq(jobs.userId, userId)
   ))
 }
 
-export const setJobReminderBeta = async (
+export const setJobReminder = async (
   jobId: string, 
-  username: string, 
+  userId: string,
   dismissRemind: boolean
 ) => {
-  await db.update(jobsBeta).set({
+  await db.update(jobs).set({
    dismissRemind
   })
   .where(and(
-    eq(jobsBeta.jobId, jobId),
-    eq(jobsBeta.user, username)
+    eq(jobs.jobId, jobId),
+    eq(jobs.userId, userId)
   ))
 }
 
-export const addUpdateBeta = async (
-  job: string,
+export const addUpdate = async (
+  jobId: string,
   updateType: string,
   updateTime: number
 ) => {
   const updateId = crypto.randomUUID()
-  await db.insert(updatesBeta).values({
+  await db.insert(updates).values({
     updateId,
-    job,
+    jobId,
     updateType,
     updateTime
   })
@@ -190,22 +209,28 @@ export const addUpdateBeta = async (
 }
 
 export const deleteUpdateBeta = async (jobId: string, updateId: string) => {
-  await db.delete(updatesBeta).where(and(
-    eq(updatesBeta.job, jobId),
-    eq(updatesBeta.updateId, updateId)
-  )).returning({del: updatesBeta.updateId})
+  await db.delete(updates).where(and(
+    eq(updates.jobId, jobId),
+    eq(updates.updateId, updateId)
+  )).returning({del: updates.updateId})
 }
 
-export const deleteJobBeta = async (id: string, username: string) => {
-  await db.delete(jobsBeta).where(and(
-    eq(jobsBeta.jobId, id),
-    eq(jobsBeta.user, username)
-  )).returning({del: jobsBeta.jobId})
+export const deleteJobBeta = async (id: string, userId: string) => {
+  await db.delete(jobs).where(and(
+    eq(jobs.jobId, id),
+    eq(jobs.userId, userId)
+  )).returning({del: jobs.jobId})
 }
 
 export const deleteUserBeta = async (username: string, passwordHash: string) => {
-  await db.delete(usersBeta).where(and(
+  const deleted = await db.delete(usersBeta).where(and(
     eq(usersBeta.username, username),
     eq(usersBeta.passwordHash, passwordHash)
-  )).returning({del: usersBeta.username})
+  )).returning({userId: usersBeta.userId})
+
+  if (deleted.length === 1) {
+    await db.delete(usersInfo).where(
+      eq(usersInfo.userId, deleted[0].userId)
+    )
+  }
 }

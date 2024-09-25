@@ -1,18 +1,14 @@
-import { getJobsByUserBeta, getUserSettingsBeta } from "../../db/db"
-import { checkToken, type dashboardJobItem, TOKEN_COOKIE, updateTypes } from "../../utils/utils"
+import { getJobsByUser, getUserSettingsBeta } from "../../db/db"
+import { checkBetaToken, type dashboardJobItem, TOKEN_COOKIE, updateTypes } from "../../utils/utils"
 
-const daysApart = (time: number, demoMode: boolean) => {
-  if (demoMode) {
-    return (Date.now() - time) / 60000
-  } else {
-    return (Date.now() - time) / 86400000
-  }
+const daysApart = (time: number) => {
+  return (Date.now() - time) / 86400000
 }
 
 export default defineEventHandler(async (e) => {
-  const uname = await checkToken(getCookie(e, TOKEN_COOKIE))
-  const settings = await getUserSettingsBeta(uname)
-  const dbJobs = await getJobsByUserBeta(uname)
+  const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
+  const settings = await getUserSettingsBeta(userId)
+  const dbJobs = await getJobsByUser(userId)
 
   const allJobs: dashboardJobItem[] = []
   const futureJobs: dashboardJobItem[] = []
@@ -27,7 +23,6 @@ export default defineEventHandler(async (e) => {
 
   let isFuture = false
   let isRemind = false
-  let hasOffer = false
 
   for (const job of dbJobs) {
     isFuture = false
@@ -35,13 +30,13 @@ export default defineEventHandler(async (e) => {
     if (!job.dismissRemind) {
       if (
         job.lastUpdateType === updateTypes.RECEIVE_OFFER &&
-        daysApart(job.lastUpdateTime, settings.demoMode) >= settings.remindOfferDays
+        daysApart(job.lastUpdateTime) >= settings.remindOfferDays
       ) {
         isRemind = true
       } else if (job.lastUpdateTime > Date.now()) {
         isFuture = true
       } else if (
-        daysApart(job.lastUpdateTime, settings.demoMode) >= settings.remindDays &&
+        daysApart(job.lastUpdateTime) >= settings.remindDays &&
         job.lastUpdateType < updateTypes.ACCEPT_OFFER
       ) {
         isRemind = true
@@ -62,7 +57,6 @@ export default defineEventHandler(async (e) => {
     ) {
       notConsideredJobs.push({...job, isFuture, isRemind})
     } else if (job.lastUpdateType === updateTypes.ACCEPT_OFFER) {
-      hasOffer = true
       acceptJobs.push({...job, isFuture, isRemind})
     } else if (job.lastUpdateType === updateTypes.RECEIVE_OFFER) {
       offerJobs.push({...job, isFuture, isRemind})
@@ -83,9 +77,8 @@ export default defineEventHandler(async (e) => {
   }
 
   return {
-    uname,
+    uname: userId,
     ...settings,
-    hasOffer,
     allJobs,
     futureJobs,
     remindJobs,

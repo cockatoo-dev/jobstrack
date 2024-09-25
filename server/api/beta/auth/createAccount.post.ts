@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { createUserBeta } from '../../../db/db'
-import { createToken, hashPassword, TOKEN_COOKIE, TOKEN_EXPIRY } from '../../../utils/utils'
+import { createBetaToken, hashPassword, TOKEN_COOKIE, TOKEN_EXPIRY } from '../../../utils/utils'
 
 const bodySchema = z.object({
   uname: z.string(),
@@ -44,7 +44,7 @@ export default defineEventHandler(async (e) => {
     })
   }
   
-  setCookie(e, TOKEN_COOKIE, await createToken(bodyData.data.uname), {
+  setCookie(e, TOKEN_COOKIE, await createBetaToken(bodyData.data.uname), {
     httpOnly: true,
     maxAge: TOKEN_EXPIRY
   })

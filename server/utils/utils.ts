@@ -1,6 +1,6 @@
 import * as jose from 'jose'
 import { JOSEError } from 'jose/errors'
-import { checkUserExistsBeta, getUserSettingsBeta } from '../db/db'
+import { getUserIdBeta } from '../db/db'
 
 // export enum updateTypes {
 //   NO_APPLICATION, 
@@ -59,7 +59,7 @@ export const TOKEN_EXPIRY = 604700
 
 const jwtSecret = new TextEncoder().encode(process.env.JOBSTRACK_JWT)
 
-export const createToken = async (uname: string) => {
+export const createBetaToken = async (uname: string) => {
   return await new jose.SignJWT({jobsTrackUname: uname})
   .setProtectedHeader({alg: "HS256"})
   .setIssuedAt()
@@ -67,7 +67,7 @@ export const createToken = async (uname: string) => {
   .sign(jwtSecret)
 }
 
-export const checkToken = async (token: string | undefined) => {
+export const checkBetaToken = async (token: string | undefined) => {
   if (!token) {
     throw createError({
       status: 403,
@@ -77,8 +77,16 @@ export const checkToken = async (token: string | undefined) => {
   
   try {
     const { payload } = await jose.jwtVerify(token, jwtSecret, {algorithms: ["HS256"]})
-    if (await checkUserExistsBeta(payload.jobsTrackUname as string)) {
-      return payload.jobsTrackUname as string
+    const authData = await getUserIdBeta(payload.jobsTrackUname as string)
+    if (authData.exists) {
+      if ((payload.iat || 0) > authData.passwordUpdateTime) {
+        return authData.userId
+      } else {
+        throw createError({
+          status: 403,
+          message: "Invalid token. Please log out and log in again."
+        })
+      }
     } else {
       throw createError({
         status: 403,
@@ -103,11 +111,11 @@ export const hashPassword = async (pass: string) => {
   return new TextDecoder().decode(passHash)
 }
 
-export const processTime = async (time: number, uname: string) => {
-  const userSettings = await getUserSettingsBeta(uname)
-  if (userSettings.demoMode) {
-    return Date.now()
-  } else {
-    return time
-  }
-}
+// export const processTime = async (time: number, uname: string) => {
+//   const userSettings = await getUserSettingsBeta(uname)
+//   if (userSettings.demoMode) {
+//     return Date.now()
+//   } else {
+//     return time
+//   }
+// }

@@ -1,4 +1,6 @@
+import { checkBetaToken } from "~/server/utils/utils"
+
 export default defineEventHandler(async (e) => {
-  const uname = await checkToken(getCookie(e, TOKEN_COOKIE))
-  return {uname}
+  const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
+  return {userId}
 })
