@@ -64,7 +64,7 @@
   <Dialog
     v-model:visible="isVisible"
     modal
-    class="w-[20rem] sm:w-[40rem] lg:w-[60rem] 2xl:w-[80rem]"
+    class="w-11/12 sm:w-[39rem] lg:w-[58rem] 2xl:w-[77rem]"
     header="Add Job"
   >
     <template #container>

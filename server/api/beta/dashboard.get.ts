@@ -1,13 +1,11 @@
-import { getJobsByUser, getUserSettingsBeta } from "../../db/db"
-import { checkBetaToken, type dashboardJobItem, TOKEN_COOKIE, updateTypes } from "../../utils/utils"
+import { getJobsByUser, getUserInfo } from "../../db/db"
+import { checkBetaToken, checkRemind, type dashboardJobItem, TOKEN_COOKIE, updateTypes } from "../../utils/utils"
 
-const daysApart = (time: number) => {
-  return (Date.now() - time) / 86400000
-}
+
 
 export default defineEventHandler(async (e) => {
   const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
-  const settings = await getUserSettingsBeta(userId)
+  const userInfo = await getUserInfo(userId)
   const dbJobs = await getJobsByUser(userId)
 
   const allJobs: dashboardJobItem[] = []
@@ -28,20 +26,15 @@ export default defineEventHandler(async (e) => {
     isFuture = false
     isRemind = false
     if (!job.dismissRemind) {
-      if (
-        job.lastUpdateType === updateTypes.RECEIVE_OFFER &&
-        daysApart(job.lastUpdateTime) >= settings.remindOfferDays
-      ) {
-        isRemind = true
-      } else if (job.lastUpdateTime > Date.now()) {
+      if (job.lastUpdateTime > Date.now()) {
         isFuture = true
-      } else if (
-        daysApart(job.lastUpdateTime) >= settings.remindDays &&
-        job.lastUpdateType < updateTypes.ACCEPT_OFFER
-      ) {
-        isRemind = true
-      } else if (job.lastUpdateType === updateTypes.NO_APPLICATION) {
-        isRemind = true
+      } else {
+        isRemind = checkRemind(
+          job.lastUpdateType,
+          job.lastUpdateTime,
+          userInfo.remindDays,
+          userInfo.remindOfferDays
+        )
       }
     }
 
@@ -77,8 +70,8 @@ export default defineEventHandler(async (e) => {
   }
 
   return {
-    uname: userId,
-    ...settings,
+    timestamp: Date.now(),
+    ...userInfo,
     allJobs,
     futureJobs,
     remindJobs,

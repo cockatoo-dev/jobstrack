@@ -74,7 +74,7 @@
     <div class="p-4 mx-auto sm:w-[640px] text-slate-800 dark:text-slate-200">
       <Tabs 
         value="login"
-        class="w-full sm:w-[640px]"
+        class="w-full"
       >
         <TabList>
           <Tab value="login">Log In</Tab>
@@ -184,6 +184,9 @@
                   fluid
                   required
                 />
+              </div>
+              <div class="pb-2 text-red-600 dark:text-red-400 text-center font-bold">
+                There is no way to recover beta accounts if the password is forgotten. Make sure to remember your password, or store it somewhere safe.
               </div>
               <div class="py-2">
                 <Button 

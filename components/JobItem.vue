@@ -3,6 +3,7 @@
   
   const props = defineProps<{
     beta: boolean
+    serverTimestamp?: number
     jobData: dashboardJobItem
     refreshData: () => Promise<void>
   }>()
@@ -15,29 +16,33 @@
     props.jobData.lastUpdateType === updateTypes.DECLINE_OFFER
   })
   const updateText = computed(() => {
-    return getUpdateAction(props.jobData.lastUpdateType, props.jobData.lastUpdateTime)
+    return getUpdateAction(
+      props.jobData.lastUpdateType, 
+      props.jobData.lastUpdateTime,
+      props.serverTimestamp || Date.now()
+    )
   })
 </script>
 
 <template>
   <div class="p-2">
     <div
-      class="w-full max-w-64 sm:w-64 h-56 border-4 rounded-lg drop-shadow-md transition-colors duration-300"
+      class="w-full max-w-64 sm:w-64 h-56 mx-auto border-4 rounded-lg drop-shadow-md transition-colors duration-300"
       :class="(
         jobData.lastUpdateType === updateTypes.ACCEPT_OFFER ? 'border-lime-500 hover:bg-lime-100 dark:hover:bg-lime-900' : 
         jobData.lastUpdateType === updateTypes.RECEIVE_OFFER ? 'border-fuchsia-500 hover:bg-fuchsia-100 dark:hover:bg-fuchsia-900' : 'border-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900'
       )"
     >
       <NuxtLink :to="`${beta ? '/beta' : ''}/job/${props.jobData.jobId}`">
-        <div class="w-full h-36 rounded-t p-2">
+        <div class="w-full h-36 rounded-t py-2">
           <h2 
-            class="pb-1 text-3xl font-bold line-clamp-2 overflow-ellipsis"
+            class="px-2 pb-1 text-3xl font-bold line-clamp-2 overflow-ellipsis"
             :class="notConsidered ? 'text-slate-500' : 'text-slate-800 dark:text-slate-200'"
           >
             {{ jobData.companyName }}
           </h2>
           <p 
-            class="font-bold line-clamp-2 overflow-ellipsis"
+            class="px-2 font-bold line-clamp-2 overflow-ellipsis"
             :class="notConsidered ? 'text-slate-500' : 'text-slate-800 dark:text-slate-200'"
           >
           {{ jobData.jobTitle }}
@@ -60,7 +65,7 @@
       </NuxtLink>
       <div 
         v-else-if="jobData.isRemind"
-        class="w-full h-[4.5rem] rounded-b p-2 bg-fuchsia-300 dark:bg-fuchsia-700 border-t-2 border-t-fuchsia-300 dark:border-t-fuchsia-700"
+        class="w-full h-[4.5rem] rounded-b bg-fuchsia-300 dark:bg-fuchsia-700 border-t-2 border-t-fuchsia-300 dark:border-t-fuchsia-700"
         @mouseenter="() => showDismiss = true"
         @mouseleave="() => showDismiss = false"
       >
@@ -71,7 +76,7 @@
           />
           
         </div>
-        <div class=" text-slate-800 dark:text-slate-200 font-bold text-center">
+        <div class="p-2 text-slate-800 dark:text-slate-200 font-bold text-center">
           {{ updateText }}
         </div>
       </div>

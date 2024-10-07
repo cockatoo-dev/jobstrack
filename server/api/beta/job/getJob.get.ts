@@ -1,6 +1,6 @@
 import { z } from "zod"
-import { getJobById } from "~/server/db/db"
-import { checkBetaToken, type updateItem } from "~/server/utils/utils"
+import { getJobById, getUserInfo } from "~/server/db/db"
+import { checkBetaToken, checkRemind, type updateItem } from "~/server/utils/utils"
 
 const querySchema = z.object({
   jobId: z.string()
@@ -16,6 +16,10 @@ export default defineEventHandler(async (e) => {
   }
 
   const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
+  const userInfo = await getUserInfo(userId)
+
+  let isFuture = false
+  let isRemind = false
 
   const dbData = await getJobById(queryData.data.jobId, userId)
   if (dbData.length === 0) {
@@ -28,16 +32,35 @@ export default defineEventHandler(async (e) => {
     companyName: dbData[0].companyName,
     jobTitle: dbData[0].jobTitle,
     jobDescription: dbData[0].jobDescription,
+    dismissRemind: dbData[0].dismissRemind,
     updates: [] as updateItem[]
   }
 
   for (const item of dbData) {
     result.updates.push({
-      updateId: item.updateId,
-      updateType: item.updateType,
-      updateTime: item.updateTime
+      updateId: item.updateId == null ?  "" : item.updateId,
+      updateType: item.updateType == null ? "" : item.updateType,
+      updateTime: item.updateTime == null ? -1 : item.updateTime
     })
   }
 
-  return result
+  if (result.updates[0].updateTime > Date.now()) {
+    isFuture = true
+  } else if (result.dismissRemind) {
+    isRemind = false
+  } else if (checkRemind(
+    result.updates[0].updateType,
+    result.updates[0].updateTime,
+    userInfo.remindDays,
+    userInfo.remindOfferDays
+  )) {
+    isRemind = true
+  }
+
+  return {
+    timestamp: Date.now(),
+    isFuture,
+    isRemind,
+    ...result
+  }
 })

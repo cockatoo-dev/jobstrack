@@ -1,9 +1,11 @@
+<script setup lang="ts">
+  defineProps<{
+    beta?: boolean
+  }>()
+</script>
+
 <template>
-  <div>
-    <NuxtLink to="/">
-      <div class=" text-3xl font-bold text-slate-800 dark:text-slate-200">
-        Jobs<span class=" text-fuchsia-500">Track</span>
-      </div>
-    </NuxtLink>
+  <div class="w-full sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] mx-auto p-1">
+    <NavLogo :beta />
   </div>
 </template>

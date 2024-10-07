@@ -2,26 +2,8 @@ import * as jose from 'jose'
 import { JOSEError } from 'jose/errors'
 import { getUserIdBeta } from '../db/db'
 
-// export enum updateTypes {
-//   NO_APPLICATION, 
-//   APPLICATION_SENT, 
-//   ONLINE_ASSESS, 
-//   INTERVIEW,
-//   PHONE_INTERVIEW,
-//   VIRTUAL_INTERVIEW, 
-//   TECH_INTERVIEW, 
-//   BEHAVE_INTERVIEW,
-//   FINAL_INTERVIEW,
-//   ASSESS_CENTER,
-//   RECEIVE_OFFER,
-//   ACCEPT_OFFER,
-//   DECLINE_OFFER,
-//   REJECT,
-//   WAITLIST
-// }
-
 export const updateTypes = {
-  NO_APPLICATION: "No Application",
+  NO_APPLICATION: "",
   APPLICATION_SENT: "Sent Application",
   ONLINE_ASSESS: "Online Assessment",
   INTERVIEW: "Interview",
@@ -79,12 +61,12 @@ export const checkBetaToken = async (token: string | undefined) => {
     const { payload } = await jose.jwtVerify(token, jwtSecret, {algorithms: ["HS256"]})
     const authData = await getUserIdBeta(payload.jobsTrackUname as string)
     if (authData.exists) {
-      if ((payload.iat || 0) > authData.passwordUpdateTime) {
+      if ((payload.iat || 0) >= authData.passwordUpdateTime) {
         return authData.userId
       } else {
         throw createError({
           status: 403,
-          message: "Invalid token. Please log out and log in again."
+          message: "Expired token. Please log in again."
         })
       }
     } else {
@@ -109,6 +91,37 @@ export const hashPassword = async (pass: string) => {
   const passBuffer = new TextEncoder().encode(pass)
   const passHash = await crypto.subtle.digest("SHA-256", passBuffer)
   return new TextDecoder().decode(passHash)
+}
+
+export const daysApart = (time: number) => {
+  return (Date.now() - time) / 86400000
+}
+
+export const checkRemind = (
+  updateType: string,
+  updateTime: number,
+  remindDays: number,
+  remindOfferDays: number
+) => {  
+  if (updateType === updateTypes.NO_APPLICATION) {
+    return true
+  } else if (
+    updateType === updateTypes.ACCEPT_OFFER ||
+    updateType === updateTypes.DECLINE_OFFER ||
+    updateType === updateTypes.REJECT ||
+    updateType === updateTypes.WAITLIST
+  ) {
+    return false
+  } else if (
+    updateType === updateTypes.RECEIVE_OFFER && 
+    daysApart(updateTime) >= remindOfferDays 
+  ) {
+    return true
+  } else if (daysApart(updateTime) >= remindDays) {
+    return true
+  } else {
+    return false
+  }
 }
 
 // export const processTime = async (time: number, uname: string) => {

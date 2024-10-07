@@ -47,8 +47,10 @@ export default defineNuxtConfig({
   },
   routeRules: {
     "/": {prerender: true},
-    "/dashboard": {ssr: false},
-    "/job/*": {ssr: false},
+    "/login": {redirect: "/beta/login", },
+    "/dashboard": {redirect: "/beta/dashboard"},
+    // "/dashboard": {ssr: false},
+    // "/job/*": {ssr: false},
     "/beta/dashboard": {ssr: false},
     "/beta/job/*": {ssr: false}
   }

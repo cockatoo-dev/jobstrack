@@ -1,25 +1,5 @@
-
-
-// export enum updateTypes {
-//   NO_APPLICATION, 
-//   APPLICATION_SENT, 
-//   ONLINE_ASSESS, 
-//   INTERVIEW,
-//   PHONE_INTERVIEW,
-//   VIRTUAL_INTERVIEW, 
-//   TECH_INTERVIEW, 
-//   BEHAVE_INTERVIEW,
-//   FINAL_INTERVIEW,
-//   ASSESS_CENTER,
-//   RECEIVE_OFFER,
-//   ACCEPT_OFFER,
-//   DECLINE_OFFER,
-//   REJECT,
-//   WAITLIST
-// }
-
 export const updateTypes = {
-  NO_APPLICATION: "No Application",
+  NO_APPLICATION: "",
   APPLICATION_SENT: "Sent Application",
   ONLINE_ASSESS: "Online Assessment",
   INTERVIEW: "Interview",
@@ -36,16 +16,35 @@ export const updateTypes = {
   WAITLIST: "Placed on Waitlist"
 }
 
+export const checkTime = (serverTimestamp: number | undefined) => {
+  const DAY = 86400000
+
+  if (!serverTimestamp) {
+    return true
+  } else if (Date.now() - serverTimestamp > DAY) {
+    return false
+  } else if (serverTimestamp - Date.now() > DAY) {
+    return false
+  } else {
+    return true
+  }
+}
+
 export const dayTimestamp = () => {
   return new Date(new Date().toDateString()).getTime()
 }
 
-export const timeToDaysString = (time: number) => {
+export const capitaliseFirst = (str: string) => {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+export const timeToDaysString = (time: number, serverTimestamp: number) => {
   const DAY = 86400000
+
+  const nowMsec = checkTime(serverTimestamp) ? Date.now() : serverTimestamp
   
-  const nowDate = new Date()
+  const nowDate = new Date(nowMsec)
   const timeDate = new Date(time)
-  const nowMsec = nowDate.getTime()
   const nowDay = new Date(nowDate.toDateString())
   const timeDay = new Date(timeDate.toDateString())
 
@@ -75,10 +74,10 @@ export const timeToDaysString = (time: number) => {
   }
 }
 
-export const getUpdateAction = (updateType: string, time: number) => {
+export const getUpdateAction = (updateType: string, time: number, serverTimestamp: number) => {
   let daysString = ""
   if (updateType !== updateTypes.NO_APPLICATION) {
-    daysString = timeToDaysString(time)
+    daysString = timeToDaysString(time, serverTimestamp)
   }
   
   if (updateType === updateTypes.APPLICATION_SENT) {

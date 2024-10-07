@@ -34,7 +34,6 @@ export default defineEventHandler(async (e) => {
   // const time = await processTime(bodyData.data.dayTimestamp, uname)
   let jobId = ""
 
-  console.log(uname)
   
   if (bodyData.data.hasApplied) {
     jobId = await createJob(
@@ -45,7 +44,6 @@ export default defineEventHandler(async (e) => {
       updateTypes.APPLICATION_SENT,
       bodyData.data.dayTimestamp
     )
-    console.log(jobId)
     await addUpdate(
       jobId,
       updateTypes.APPLICATION_SENT,

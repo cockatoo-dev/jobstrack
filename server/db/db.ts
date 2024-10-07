@@ -79,8 +79,9 @@ export const getUserIdBeta = async (username: string) => {
   }
 }
 
-export const getUserSettingsBeta = async (userId: string) => {
+export const getUserInfo = async (userId: string) => {
   const data = await db.select({
+    username: usersInfo.username,
     remindDays: usersInfo.remindDays,
     remindOfferDays: usersInfo.remindOfferDays
   })
@@ -139,7 +140,7 @@ export const getJobById = async (jobId: string, userId: string) => {
     updateTime: updates.updateTime
   })
   .from(jobs)
-  .innerJoin(updates, eq(updates.jobId, jobs.jobId))
+  .leftJoin(updates, eq(updates.jobId, jobs.jobId))
   .where(and(
     eq(jobs.jobId, jobId),
     eq(jobs.userId, userId)

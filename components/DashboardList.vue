@@ -3,6 +3,7 @@
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const props = defineProps<{
     beta: boolean
+    serverTimestamp?: number
     jobs: dashboardJobItem[]
     refreshData: () => Promise<void>
   }>()
@@ -15,6 +16,7 @@
       :key="job.jobId"
       :job-data="job"
       :refresh-data="refreshData"
+      :server-timestamp
       :beta
     />
   </div>
