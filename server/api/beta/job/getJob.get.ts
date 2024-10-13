@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { getJobById, getUserInfo } from "~/server/db/db"
-import { checkBetaToken, checkRemind, type updateItem } from "~/server/utils/utils"
+import { checkBetaToken, checkRemind, type updateItem } from "~/server/utils/serverUtils"
 
 const querySchema = z.object({
   jobId: z.string()

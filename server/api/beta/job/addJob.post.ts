@@ -1,17 +1,18 @@
 import { z } from "zod"
 import { addUpdate, createJob } from "~/server/db/db"
-import { checkBetaToken } from "~/server/utils/utils"
+import { checkBetaToken } from "~/server/utils/serverUtils"
 
 const bodySchema = z.object({
   companyName: z.string(),
   jobTitle: z.string(),
   jobDescription: z.string(),
   hasApplied: z.boolean(),
+  applicationNotes: z.string(),
   dayTimestamp: z.number()
 })
 
 export default defineEventHandler(async (e) => {
-  const bodyData = await readValidatedBody(e, body => bodySchema.safeParse(body))
+  const bodyData = await readValidatedBody(e, b => bodySchema.safeParse(b))
   if (!bodyData.success) {
     throw createError({
       status: 400,
@@ -33,7 +34,6 @@ export default defineEventHandler(async (e) => {
   const uname = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
   // const time = await processTime(bodyData.data.dayTimestamp, uname)
   let jobId = ""
-
   
   if (bodyData.data.hasApplied) {
     jobId = await createJob(
@@ -47,7 +47,8 @@ export default defineEventHandler(async (e) => {
     await addUpdate(
       jobId,
       updateTypes.APPLICATION_SENT,
-      bodyData.data.dayTimestamp
+      bodyData.data.dayTimestamp,
+      bodyData.data.applicationNotes
     )
   } else {
     jobId = await createJob(

@@ -3,7 +3,7 @@
   
   const props = defineProps<{
     beta: boolean
-    serverTimestamp?: number
+    timestamp: number
     jobData: dashboardJobItem
     refreshData: () => Promise<void>
   }>()
@@ -19,7 +19,7 @@
     return getUpdateAction(
       props.jobData.lastUpdateType, 
       props.jobData.lastUpdateTime,
-      props.serverTimestamp || Date.now()
+      props.timestamp
     )
   })
 </script>

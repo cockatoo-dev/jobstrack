@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { createUserBeta } from '../../../db/db'
-import { createBetaToken, hashPassword, TOKEN_COOKIE, TOKEN_EXPIRY } from '../../../utils/utils'
+import { createBetaToken, hashPassword, TOKEN_COOKIE, TOKEN_EXPIRY } from '../../../utils/serverUtils'
 
 const bodySchema = z.object({
   uname: z.string(),
@@ -9,7 +9,7 @@ const bodySchema = z.object({
 })
 
 export default defineEventHandler(async (e) => {
-  const bodyData = await readValidatedBody(e, body => bodySchema.safeParse(body))
+  const bodyData = await readValidatedBody(e, b => bodySchema.safeParse(b))
 
   if (!bodyData.success) {
     throw createError({

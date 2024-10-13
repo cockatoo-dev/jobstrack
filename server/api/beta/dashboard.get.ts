@@ -1,5 +1,5 @@
 import { getJobsByUser, getUserInfo } from "../../db/db"
-import { checkBetaToken, checkRemind, type dashboardJobItem, TOKEN_COOKIE, updateTypes } from "../../utils/utils"
+import { checkBetaToken, checkRemind, type dashboardJobItem, TOKEN_COOKIE, updateTypes } from "../../utils/serverUtils"
 
 
 

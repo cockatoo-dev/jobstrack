@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { checkTime } from '~/utils/utils';
+import { checkTime } from '~/utils/clientUtils';
 
   const props = defineProps<{
     serverTimestamp?: number

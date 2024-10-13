@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { FetchError } from 'ofetch'
-  import { dayTimestamp } from '~/utils/utils'
+  import { dayTimestamp } from '~/utils/clientUtils'
 
   const isVisible = defineModel<boolean>()
   const props = defineProps<{
@@ -14,6 +14,7 @@
   const jobTitle = ref("")
   const jobDescription = ref("")
   const hasApplied = ref(false)
+  const applicationNotes = ref("")
   const formLoading = ref(false)
   const errorMessage = ref("")
 
@@ -37,7 +38,8 @@
           jobTitle: jobTitle.value,
           jobDescription: jobDescription.value,
           hasApplied: hasApplied.value,
-          dayTimestamp: dayTimestamp()
+          dayTimestamp: dayTimestamp(),
+          applicationNotes: applicationNotes.value
         }
       })
 
@@ -87,6 +89,7 @@
               class="block w-full"
               required
             />
+            <CharLimit :str="companyName" :limit="100" :show-length="50" />
           </div>
           <div class="pb-4">
             <label 
@@ -101,6 +104,7 @@
               class="block w-full"
               required
             />
+            <CharLimit :str="jobTitle" :limit="100" :show-length="50" />
           </div>
           <div class="pb-4">
             <label 
@@ -118,6 +122,7 @@
               class="block w-full"
               rows="5"
             />
+            <CharLimit :str="jobDescription" :limit="10000" :show-length="8000" />
           </div>
           <div class="pt-2 pb-4 flex gap-2">
             <div>
@@ -135,6 +140,23 @@
                 Job Application Sent
               </label>
             </div>
+          </div>
+          <div v-if="hasApplied" class="pb-4">
+            <label 
+              for="add-applicationNotes"
+              class="block pb-1 text-slate-800 dark:text-slate-200"
+            >
+              <div>Application Notes</div>
+              <div class="text-sm">
+                Any notes you may want to keep about the job application.
+              </div>
+            </label>
+            <Textarea
+              id="add-applicationNotes"
+              v-model="applicationNotes"
+              class="block w-full"
+              rows="5"
+            />
           </div>
           <div class="py-2 flex gap-2">
             <Button 

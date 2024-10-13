@@ -137,7 +137,8 @@ export const getJobById = async (jobId: string, userId: string) => {
     dismissRemind: jobs.dismissRemind,
     updateId: updates.updateId,
     updateType: updates.updateType,
-    updateTime: updates.updateTime
+    updateTime: updates.updateTime,
+    updateNotes: updates.updateNotes
   })
   .from(jobs)
   .leftJoin(updates, eq(updates.jobId, jobs.jobId))
@@ -146,6 +147,33 @@ export const getJobById = async (jobId: string, userId: string) => {
     eq(jobs.userId, userId)
   ))
   .orderBy(desc(updates.updateTime))
+}
+
+export const checkJobOwner = async (jobId: string, userId: string) => {
+  const result = await db.select({jobId: jobs.jobId})
+  .from(jobs)
+  .where(and(
+    eq(jobs.jobId, jobId),
+    eq(jobs.userId, userId)
+  ))
+
+  return result.length >= 1
+}
+
+export const getJobData = async (jobId: string, userId: string) => {
+  return await db.select({
+    jobId: jobs.jobId,
+    companyName: jobs.companyName,
+    jobTitle: jobs.jobTitle,
+    dismissRemind: jobs.dismissRemind,
+    lastUpdateType: jobs.lastUpdateType,
+    lastUpdateTime: jobs.lastUpdateTime
+  })
+  .from(jobs)
+  .where(and(
+    eq(jobs.jobId, jobId),
+    eq(jobs.userId, userId)
+  ))
 }
 
 export const getJobsByUser = async (userId: string) => {
@@ -194,31 +222,49 @@ export const setJobReminder = async (
   ))
 }
 
+export const setJobLastUpdate = async (
+  jobId: string,
+  userId: string,
+  lastUpdateType: string,
+  lastUpdateTime: number
+) => {
+  await db.update(jobs).set({
+    lastUpdateTime,
+    lastUpdateType
+  })
+  .where(and(
+    eq(jobs.jobId, jobId),
+    eq(jobs.userId, userId)
+  ))
+}
+
 export const addUpdate = async (
   jobId: string,
   updateType: string,
-  updateTime: number
+  updateTime: number,
+  updateNotes: string
 ) => {
   const updateId = crypto.randomUUID()
   await db.insert(updates).values({
     updateId,
     jobId,
     updateType,
-    updateTime
+    updateTime,
+    updateNotes
   })
   return updateId
 }
 
-export const deleteUpdateBeta = async (jobId: string, updateId: string) => {
-  await db.delete(updates).where(and(
+export const deleteUpdate = async (jobId: string, updateId: string) => {
+  return await db.delete(updates).where(and(
     eq(updates.jobId, jobId),
     eq(updates.updateId, updateId)
   )).returning({del: updates.updateId})
 }
 
-export const deleteJobBeta = async (id: string, userId: string) => {
-  await db.delete(jobs).where(and(
-    eq(jobs.jobId, id),
+export const deleteJob = async (jobId: string, userId: string) => {
+  return await db.delete(jobs).where(and(
+    eq(jobs.jobId, jobId),
     eq(jobs.userId, userId)
   )).returning({del: jobs.jobId})
 }

@@ -30,5 +30,6 @@ export const updates = sqliteTable("updates", {
   updateId: text("updateId").primaryKey(),
   jobId: text("jobId").references(() => jobs.jobId, {onDelete: 'cascade'}).notNull(),
   updateType: text("updateType").notNull(),
-  updateTime: int("updateTime").notNull()
+  updateTime: int("updateTime").notNull(),
+  updateNotes: text("updateNotes").notNull()
 })

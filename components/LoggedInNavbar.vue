@@ -6,6 +6,10 @@
     refreshData: () => Promise<void>
   }>()
   
+  const alertFunction = () => {
+    alert(1)
+  }
+  
   const logout = async () => {
     try {
       if (props.beta) {
@@ -24,10 +28,13 @@
 </script>
 
 <template>
-  <div class="grid grid-cols-[1fr_auto] w-full sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] mx-auto p-1">
+  <div class="grid grid-cols-[1fr_auto_auto] w-full sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] mx-auto px-2 py-1">
     <NavLogo :beta />
     <div>
-      <Button label="logout" @click="logout" />
+      <Button link label="User Settings" @click="alertFunction" />
+    </div>
+    <div>
+      <Button link label="Logout" @click="logout" />
     </div>
   </div>
 </template>

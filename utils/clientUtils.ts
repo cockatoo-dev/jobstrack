@@ -2,6 +2,7 @@ export const updateTypes = {
   NO_APPLICATION: "",
   APPLICATION_SENT: "Sent Application",
   ONLINE_ASSESS: "Online Assessment",
+  TAKE_HONE: "Take Home Task",
   INTERVIEW: "Interview",
   PHONE_INTERVIEW: "Phone Interview",
   VIRTUAL_INTERVIEW: "Virtual Interview",
@@ -38,10 +39,8 @@ export const capitaliseFirst = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-export const timeToDaysString = (time: number, serverTimestamp: number) => {
+export const timeToDaysString = (time: number, nowMsec: number) => {
   const DAY = 86400000
-
-  const nowMsec = checkTime(serverTimestamp) ? Date.now() : serverTimestamp
   
   const nowDate = new Date(nowMsec)
   const timeDate = new Date(time)
@@ -74,54 +73,60 @@ export const timeToDaysString = (time: number, serverTimestamp: number) => {
   }
 }
 
-export const getUpdateAction = (updateType: string, time: number, serverTimestamp: number) => {
+export const getUpdateAction = (updateType: string, updateTime: number, timestamp: number) => {
   let daysString = ""
   if (updateType !== updateTypes.NO_APPLICATION) {
-    daysString = timeToDaysString(time, serverTimestamp)
+    daysString = timeToDaysString(updateTime, timestamp)
   }
   
   if (updateType === updateTypes.APPLICATION_SENT) {
     return `You submitted your application ${daysString}.`
   } else if (updateType === updateTypes.ONLINE_ASSESS) {
     return `You completed an online assessment ${daysString}.`
+  } else if (updateType === updateTypes.TAKE_HONE) {
+    if (timestamp < updateTime) {
+      return `You have a take home task due ${daysString}.`
+    } else {
+      return `You completed a take home task ${daysString}.`
+    }
   } else if (updateType === updateTypes.INTERVIEW) {
-    if (Date.now() < time) {
+    if (timestamp < updateTime) {
       return `You have a interview ${daysString}.`
     } else {
       return `You had an interview ${daysString}.`
     }
   } else if (updateType === updateTypes.PHONE_INTERVIEW) {
-    if (Date.now() < time) {
+    if (timestamp < updateTime) {
       return `You have a phone interview ${daysString}.`
     } else {
       return `You had a phone interview ${daysString}.`
     }
   } else if (updateType === updateTypes.VIRTUAL_INTERVIEW) {
-    if (Date.now() < time) {
+    if (timestamp < updateTime) {
       return `You have a virtual interview ${daysString}.`
     } else {
       return `You had a virtual interview ${daysString}.`
     }
   } else if (updateType === updateTypes.TECH_INTERVIEW) {
-    if (Date.now() < time) {
+    if (timestamp < updateTime) {
       return `You have a technical interview ${daysString}.`
     } else {
       return `You had a technical interview ${daysString}.`
     }
   } else if (updateType === updateTypes.BEHAVE_INTERVIEW) {
-    if (Date.now() < time) {
+    if (timestamp < updateTime) {
       return `You have a behavioural interview ${daysString}.`
     } else {
       return `You had a behavioural interview ${daysString}.`
     }
   } else if (updateType === updateTypes.FINAL_INTERVIEW) {
-    if (Date.now() < time) {
+    if (timestamp < updateTime) {
       return `You have a final interview ${daysString}.`
     } else {
       return `You had a final interview ${daysString}.`
     }
   } else if (updateType === updateTypes.ASSESS_CENTER) {
-    if (Date.now() < time) {
+    if (timestamp < updateTime) {
       return `You have an assessment center ${daysString}.`
     } else {
       return `You attended an assessment center ${daysString}.`

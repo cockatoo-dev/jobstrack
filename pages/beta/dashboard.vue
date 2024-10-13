@@ -8,6 +8,16 @@
     }
   })
 
+  const timestampInUse = computed(() => {
+    if (!data.value) {
+      return Date.now()
+    } else if (checkTime(data.value.timestamp)) {
+      return Date.now()
+    } else {
+      return data.value.timestamp
+    }
+  })
+
   const selectedView = ref("reminders")
   const remindersDisplay = ref<string[]>([])
   const stagesDisplay = ref<string[]>([])
@@ -116,6 +126,7 @@
                 <AccordionContent class="px-0">
                   <DashboardList 
                     beta
+                    :timestamp="timestampInUse"
                     :jobs="data.futureJobs"
                     :refresh-data="refresh"
                   />
@@ -130,6 +141,7 @@
                 <AccordionContent class="px-0">
                   <DashboardList 
                     beta
+                    :timestamp="timestampInUse"
                     :jobs="data.remindJobs"
                     :refresh-data="refresh"
                   />
@@ -152,6 +164,7 @@
                 <AccordionContent>
                   <DashboardList 
                     beta
+                    :timestamp="timestampInUse"
                     :jobs="data.acceptJobs"
                     :refresh-data="refresh"
                   />
@@ -166,6 +179,7 @@
                 <AccordionContent>
                   <DashboardList 
                     beta
+                    :timestamp="timestampInUse"
                     :jobs="data.offerJobs"
                     :refresh-data="refresh"
                   />
@@ -180,6 +194,7 @@
                 <AccordionContent>
                   <DashboardList 
                     beta
+                    :timestamp="timestampInUse"
                     :jobs="data.finalJobs"
                     :refresh-data="refresh"
                   />
@@ -194,6 +209,7 @@
                 <AccordionContent>
                   <DashboardList 
                     beta
+                    :timestamp=timestampInUse
                     :jobs="data.interviewJobs"
                     :refresh-data="refresh"
                   />
@@ -208,6 +224,7 @@
                 <AccordionContent>
                   <DashboardList 
                     beta
+                    :timestamp="timestampInUse"
                     :jobs="data.appliedJobs"
                     :refresh-data="refresh"
                   />
@@ -222,6 +239,7 @@
                 <AccordionContent>
                   <DashboardList 
                     beta
+                    :timestamp="timestampInUse"
                     :jobs="data.notAppliedJobs"
                     :refresh-data="refresh"
                   />
@@ -236,6 +254,7 @@
                 <AccordionContent>
                   <DashboardList 
                     beta
+                    :timestamp="timestampInUse"
                     :jobs="data.notConsideredJobs"
                     :refresh-data="refresh"
                   />
@@ -246,12 +265,15 @@
         </TabPanels>
       </Tabs>
 
-      <div class="text-xl font-bold text-slate-800 dark:text-slate-200">All Jobs</div>
-      <DashboardList
-        beta
-        :jobs="data?.allJobs || []" 
-        :refresh-data="refresh" 
-      />
+      <div v-if="data">
+        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200">All Jobs</h3>
+        <DashboardList
+          beta
+          :timestamp="timestampInUse"
+          :jobs="data?.allJobs || []" 
+          :refresh-data="refresh" 
+        />
+      </div>
     </div>
   </div>
 </template>

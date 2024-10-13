@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/utils';
+import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUtils';
 
   const route = useRoute()
 

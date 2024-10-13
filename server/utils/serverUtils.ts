@@ -1,11 +1,13 @@
 import * as jose from 'jose'
 import { JOSEError } from 'jose/errors'
 import { getUserIdBeta } from '../db/db'
+import { sha256base64 } from 'ohash'
 
 export const updateTypes = {
   NO_APPLICATION: "",
   APPLICATION_SENT: "Sent Application",
   ONLINE_ASSESS: "Online Assessment",
+  TAKE_HOME: "Take Home Task",
   INTERVIEW: "Interview",
   PHONE_INTERVIEW: "Phone Interview",
   VIRTUAL_INTERVIEW: "Virtual Interview",
@@ -87,14 +89,28 @@ export const checkBetaToken = async (token: string | undefined) => {
   }
 }
 
-export const hashPassword = async (pass: string) => {
-  const passBuffer = new TextEncoder().encode(pass)
-  const passHash = await crypto.subtle.digest("SHA-256", passBuffer)
-  return new TextDecoder().decode(passHash)
+export const hashPassword = async (password: string) => {
+  return sha256base64(password)
 }
 
 export const daysApart = (time: number) => {
   return (Date.now() - time) / 86400000
+}
+
+export const checkTime = (clientTimestamp: number) => {
+  const DAY = 86400000
+
+  if (Date.now() - clientTimestamp > DAY) {
+    return false
+  } else if (clientTimestamp - Date.now() > DAY) {
+    return false
+  } else {
+    return true
+  }
+}
+
+export const dayTimestamp = () => {
+  return new Date(new Date().toDateString()).getTime()
 }
 
 export const checkRemind = (

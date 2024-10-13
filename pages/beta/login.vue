@@ -70,7 +70,7 @@
 
 <template>
   <div>
-    <LoggedOutNavbar />
+    <LoggedOutNavbar beta />
     <div class="p-4 mx-auto sm:w-[640px] text-slate-800 dark:text-slate-200">
       <Tabs 
         value="login"
