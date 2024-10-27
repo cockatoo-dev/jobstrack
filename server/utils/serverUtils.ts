@@ -3,6 +3,12 @@ import { JOSEError } from 'jose/errors'
 import { getUserIdBeta } from '../db/db'
 import { sha256base64 } from 'ohash'
 
+export const DAY = 86400000
+export const limits = {
+  JOB_LIMIT: 100,
+  UPDATE_LIMIT: 10
+}
+
 export const updateTypes = {
   NO_APPLICATION: "",
   APPLICATION_SENT: "Sent Application",
@@ -12,7 +18,7 @@ export const updateTypes = {
   PHONE_INTERVIEW: "Phone Interview",
   VIRTUAL_INTERVIEW: "Virtual Interview",
   TECH_INTERVIEW: "Technical Interview",
-  BEHAVE_INTERVIEW: "Behaviourla Interview",
+  BEHAVE_INTERVIEW: "Behavioural Interview",
   FINAL_INTERVIEW: "Final Interview",
   ASSESS_CENTER: "Assessment Center",
   RECEIVE_OFFER: "Received Offer",
@@ -26,8 +32,8 @@ export type dashboardJobItem = {
   jobId: string,
   companyName: string,
   jobTitle: string,
-  lastUpdateType: string,
-  lastUpdateTime: number,
+  updateType: string,
+  updateTime: number,
   isFuture: boolean,
   isRemind: boolean
 }
@@ -35,7 +41,8 @@ export type dashboardJobItem = {
 export type updateItem = {
   updateId: string,
   updateType: string,
-  updateTime: number
+  updateTime: number,
+  updateNotes: string
 }
 
 export const TOKEN_COOKIE = "JobsTrackAuth"
@@ -94,24 +101,57 @@ export const hashPassword = async (password: string) => {
 }
 
 export const daysApart = (time: number) => {
-  return (Date.now() - time) / 86400000
+  return (Date.now() - time) / DAY
 }
 
 export const checkTime = (clientTimestamp: number) => {
-  const DAY = 86400000
-
-  if (Date.now() - clientTimestamp > DAY) {
+  const serverTimestamp = Date.now()
+  if (serverTimestamp - clientTimestamp > DAY) {
     return false
-  } else if (clientTimestamp - Date.now() > DAY) {
+  } else if (clientTimestamp - serverTimestamp > DAY) {
     return false
   } else {
     return true
   }
 }
 
+export const getCheckedTime = (clientTimestamp: number) => {
+  const serverTimestamp = Date.now()
+  if (serverTimestamp - clientTimestamp > DAY) {
+    return serverTimestamp
+  } else if (clientTimestamp - serverTimestamp > DAY) {
+    return serverTimestamp
+  } else {
+    return clientTimestamp
+  }
+}
+
 export const dayTimestamp = () => {
   return new Date(new Date().toDateString()).getTime()
 }
+
+export const checkDay = (clientTimestamp: number) => {
+  const serverTimestamp = dayTimestamp()
+  if (serverTimestamp - clientTimestamp > DAY) {
+    return false
+  } else if (clientTimestamp - serverTimestamp > DAY) {
+    return false
+  } else {
+    return true
+  }
+}
+
+export const getCheckedDay = (clientTimestamp: number) => {
+  const serverTimestamp = dayTimestamp()
+  if (serverTimestamp - clientTimestamp > DAY) {
+    return serverTimestamp
+  } else if (clientTimestamp - serverTimestamp > DAY) {
+    return serverTimestamp
+  } else {
+    return clientTimestamp
+  }
+}
+
 
 export const checkRemind = (
   updateType: string,

@@ -1,6 +1,5 @@
 import { z } from "zod"
-import { getJobById, getUserInfo } from "~/server/db/db"
-import { checkBetaToken, checkRemind, type updateItem } from "~/server/utils/serverUtils"
+import { getJobData, getUserInfo } from "~/server/db/db"
 
 const querySchema = z.object({
   jobId: z.string()
@@ -21,27 +20,19 @@ export default defineEventHandler(async (e) => {
   let isFuture = false
   let isRemind = false
 
-  const dbData = await getJobById(queryData.data.jobId, userId)
-  if (dbData.length === 0) {
+  const dbData = await getJobData(queryData.data.jobId, userId)
+  if (!dbData) {
     throw createError({
       status: 400,
       message: "Invalid job ID."
     })
   }
   const result = {
-    companyName: dbData[0].companyName,
-    jobTitle: dbData[0].jobTitle,
-    jobDescription: dbData[0].jobDescription,
-    dismissRemind: dbData[0].dismissRemind,
-    updates: [] as updateItem[]
-  }
-
-  for (const item of dbData) {
-    result.updates.push({
-      updateId: item.updateId == null ?  "" : item.updateId,
-      updateType: item.updateType == null ? "" : item.updateType,
-      updateTime: item.updateTime == null ? -1 : item.updateTime
-    })
+    companyName: dbData.companyName,
+    jobTitle: dbData.jobTitle,
+    jobDescription: dbData.jobDescription,
+    dismissRemind: dbData.dismissRemind,
+    updates: dbData.updates
   }
 
   if (result.updates[0].updateTime > Date.now()) {

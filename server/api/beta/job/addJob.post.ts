@@ -1,6 +1,5 @@
 import { z } from "zod"
-import { addUpdate, createJob } from "~/server/db/db"
-import { checkBetaToken } from "~/server/utils/serverUtils"
+import { addUpdate, createJob, getUserJobs } from "~/server/db/db"
 
 const bodySchema = z.object({
   companyName: z.string(),
@@ -8,6 +7,7 @@ const bodySchema = z.object({
   jobDescription: z.string(),
   hasApplied: z.boolean(),
   applicationNotes: z.string(),
+  timestamp: z.number(),
   dayTimestamp: z.number()
 })
 
@@ -29,35 +29,52 @@ export default defineEventHandler(async (e) => {
       status: 400,
       message: "Some required fields are empty,"
     })
+  } else if (
+    bodyData.data.companyName.length > 100 ||
+    bodyData.data.jobTitle.length > 100 ||
+    bodyData.data.jobDescription.length > 10000 ||
+    bodyData.data.applicationNotes.length > 1000
+  ) {
+    throw createError({
+      status: 400,
+      message: "Text in some fields is too long."
+    })
   }
   
-  const uname = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
-  // const time = await processTime(bodyData.data.dayTimestamp, uname)
+  const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
+
+  const userJobs = await getUserJobs(userId)
+  if (userJobs.length > limits.JOB_LIMIT) {
+    throw createError({
+      status: 400,
+      message: "User's job limit reached."
+    })
+  }
+  
+  const checkedTime = getCheckedTime(bodyData.data.timestamp)
+  const checkedDay = getCheckedDay(bodyData.data.dayTimestamp)
   let jobId = ""
   
   if (bodyData.data.hasApplied) {
     jobId = await createJob(
-      uname,
+      userId,
       bodyData.data.companyName,
       bodyData.data.jobTitle,
       bodyData.data.jobDescription,
-      updateTypes.APPLICATION_SENT,
-      bodyData.data.dayTimestamp
     )
     await addUpdate(
       jobId,
       updateTypes.APPLICATION_SENT,
-      bodyData.data.dayTimestamp,
+      checkedTime,
+      checkedDay,
       bodyData.data.applicationNotes
     )
   } else {
     jobId = await createJob(
-      uname,
+      userId,
       bodyData.data.companyName,
       bodyData.data.jobTitle,
       bodyData.data.jobDescription,
-      updateTypes.NO_APPLICATION,
-      1
     )
   }
   return {jobId}

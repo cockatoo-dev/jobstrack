@@ -1,12 +1,11 @@
-import { getJobsByUser, getUserInfo } from "../../db/db"
-import { checkBetaToken, checkRemind, type dashboardJobItem, TOKEN_COOKIE, updateTypes } from "../../utils/serverUtils"
-
-
+import { getDashboardJobs, getUserInfo } from "../../db/db"
+import { DAY } from "#imports"
 
 export default defineEventHandler(async (e) => {
   const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
   const userInfo = await getUserInfo(userId)
-  const dbJobs = await getJobsByUser(userId)
+
+  const dbJobs = await getDashboardJobs(userId)
 
   const allJobs: dashboardJobItem[] = []
   const futureJobs: dashboardJobItem[] = []
@@ -19,54 +18,89 @@ export default defineEventHandler(async (e) => {
   const notAppliedJobs: dashboardJobItem[] = []
   const notConsideredJobs: dashboardJobItem[] = []
 
-  let isFuture = false
-  let isRemind = false
+  for (const job of dbJobs) { 
+    let updateType = updateTypes.NO_APPLICATION
+    let updateTime = -1
+    let futureIndex = 0
+    let checkFuture = true
+    let isFuture = false
+    let isRemind = false
 
-  for (const job of dbJobs) {
-    isFuture = false
-    isRemind = false
-    if (!job.dismissRemind) {
-      if (job.lastUpdateTime > Date.now()) {
-        isFuture = true
+    // Get earliest future update (if any), or latest past update.
+    // Updates already sorted by DB on updateTime descending.
+    if (job.updates.length === 0) {
+      isRemind = !job.dismissRemind
+    } else if (job.updates[0].updateTime > Date.now()) {
+      while (checkFuture) {
+        if (futureIndex === job.updates.length) {
+          checkFuture = false
+        } else if (job.updates[futureIndex + 1].updateTime > Date.now()) {
+          checkFuture = false
+        } else {
+          futureIndex += 1
+        }
+      }
+      updateType = job.updates[futureIndex].updateType
+      updateTime = job.updates[futureIndex].updateTime
+      isFuture = userInfo.remindFuture
+    } else {
+      updateType = job.updates[0].updateType
+      updateTime = job.updates[0].updateDay
+      if (
+        updateType === updateTypes.ACCEPT_OFFER ||
+        updateType === updateTypes.DECLINE_OFFER ||
+        updateType === updateTypes.REJECT ||
+        updateType === updateTypes.WAITLIST
+      ) {
+        isRemind = false
+      } else if (updateType === updateTypes.RECEIVE_OFFER) {
+        isRemind = Date.now() - updateTime > DAY * userInfo.remindOfferDays
       } else {
-        isRemind = checkRemind(
-          job.lastUpdateType,
-          job.lastUpdateTime,
-          userInfo.remindDays,
-          userInfo.remindOfferDays
-        )
+        isRemind = Date.now() - updateTime > DAY * userInfo.remindDays
       }
     }
 
-    if (isFuture) {
-      futureJobs.push({...job, isFuture, isRemind})
-    } else if (isRemind) {
-      remindJobs.push({...job, isFuture, isRemind})
+    const jobData = {
+      jobId: job.jobId,
+      companyName: job.companyName,
+      jobTitle: job.jobTitle,
+      updateType,
+      updateTime,
+      isFuture,
+      isRemind
     }
-    if (
-      job.lastUpdateType === updateTypes.DECLINE_OFFER ||
-      job.lastUpdateType === updateTypes.REJECT ||
-      job.lastUpdateType === updateTypes.WAITLIST
-    ) {
-      notConsideredJobs.push({...job, isFuture, isRemind})
-    } else if (job.lastUpdateType === updateTypes.ACCEPT_OFFER) {
-      acceptJobs.push({...job, isFuture, isRemind})
-    } else if (job.lastUpdateType === updateTypes.RECEIVE_OFFER) {
-      offerJobs.push({...job, isFuture, isRemind})
-    } else if (
-      job.lastUpdateType === updateTypes.ASSESS_CENTER ||
-      job.lastUpdateType === updateTypes.FINAL_INTERVIEW
-    ) {
-      finalJobs.push({...job, isFuture, isRemind})
-    } else if (job.lastUpdateType === updateTypes.APPLICATION_SENT) {
-      appliedJobs.push({...job, isFuture, isRemind})
-    } else if (job.lastUpdateType === updateTypes.NO_APPLICATION) {
-      notAppliedJobs.push({...job, isFuture, isRemind})
-    } else {
-      interviewJobs.push({...job, isFuture, isRemind})
+    allJobs.push(jobData)
+    
+    // Set reminders view jobs
+    if (jobData.isFuture) {
+      futureJobs.push(jobData)
+    } else if (jobData.isRemind) {
+      remindJobs.push(jobData)
     }
 
-    allJobs.push({...job, isFuture, isRemind})
+    // Set stages view jobs
+    if (
+      jobData.updateType === updateTypes.DECLINE_OFFER ||
+      jobData.updateType === updateTypes.REJECT ||
+      jobData.updateType === updateTypes.WAITLIST
+    ) {
+      notConsideredJobs.push(jobData)
+    } else if (jobData.updateType === updateTypes.ACCEPT_OFFER) {
+      acceptJobs.push(jobData)
+    } else if (jobData.updateType === updateTypes.RECEIVE_OFFER) {
+      offerJobs.push(jobData)
+    } else if (
+      jobData.updateType === updateTypes.ASSESS_CENTER ||
+      jobData.updateType === updateTypes.FINAL_INTERVIEW
+    ) {
+      finalJobs.push(jobData)
+    } else if (jobData.updateType === updateTypes.APPLICATION_SENT) {
+      appliedJobs.push(jobData)
+    } else if (jobData.updateType === updateTypes.NO_APPLICATION) {
+      notAppliedJobs.push(jobData)
+    } else {
+      interviewJobs.push(jobData)
+    }
   }
 
   return {

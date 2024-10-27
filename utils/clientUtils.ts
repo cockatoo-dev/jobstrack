@@ -1,13 +1,19 @@
+export const DAY = 86400000
+export const limits = {
+  JOB_LIMIT: 100,
+  UPDATE_LIMIT: 10
+}
+
 export const updateTypes = {
   NO_APPLICATION: "",
   APPLICATION_SENT: "Sent Application",
   ONLINE_ASSESS: "Online Assessment",
-  TAKE_HONE: "Take Home Task",
+  TAKE_HOME: "Take Home Task",
   INTERVIEW: "Interview",
   PHONE_INTERVIEW: "Phone Interview",
   VIRTUAL_INTERVIEW: "Virtual Interview",
   TECH_INTERVIEW: "Technical Interview",
-  BEHAVE_INTERVIEW: "Behaviourla Interview",
+  BEHAVE_INTERVIEW: "Behavioural Interview",
   FINAL_INTERVIEW: "Final Interview",
   ASSESS_CENTER: "Assessment Center",
   RECEIVE_OFFER: "Received Offer",
@@ -83,7 +89,7 @@ export const getUpdateAction = (updateType: string, updateTime: number, timestam
     return `You submitted your application ${daysString}.`
   } else if (updateType === updateTypes.ONLINE_ASSESS) {
     return `You completed an online assessment ${daysString}.`
-  } else if (updateType === updateTypes.TAKE_HONE) {
+  } else if (updateType === updateTypes.TAKE_HOME) {
     if (timestamp < updateTime) {
       return `You have a take home task due ${daysString}.`
     } else {
@@ -91,7 +97,7 @@ export const getUpdateAction = (updateType: string, updateTime: number, timestam
     }
   } else if (updateType === updateTypes.INTERVIEW) {
     if (timestamp < updateTime) {
-      return `You have a interview ${daysString}.`
+      return `You have an interview ${daysString}.`
     } else {
       return `You had an interview ${daysString}.`
     }
@@ -154,8 +160,8 @@ export type dashboardJobItem = {
   jobId: string,
   companyName: string,
   jobTitle: string,
-  lastUpdateType: string,
-  lastUpdateTime: number,
+  updateType: string,
+  updateTime: number,
   isFuture: boolean,
   isRemind: boolean
 }

@@ -2,11 +2,14 @@
 import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUtils';
 
   const route = useRoute()
+  const showAddUpdate = ref(false)
 
   const { data, error, refresh } = useFetch("/api/beta/job/getJob", {
     method: 'get',
     query: {jobId: route.params.jobId}
   })
+
+  const checkedTime = useCheckedTime(data)
 
   watch(error, async () => {
     if (error.value?.status === 403) {
@@ -19,6 +22,15 @@ import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUt
   <div>
     <LoggedInNavbar beta :refresh-data="refresh" />
     <TimeWarning :server-timestamp="data?.timestamp" />
+    
+    <AddUpdateModal 
+      v-model="showAddUpdate"
+      beta
+      :timestamp="checkedTime"
+      :job-id="route.params.jobId"
+      :last-update-type="data?.updates[0].updateType || updateTypes.NO_APPLICATION"
+      :refresh-data="refresh"
+    />
 
     <div 
       class="w-full sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] p-2 sm:p-0 mx-auto"
@@ -27,7 +39,7 @@ import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUt
       <div v-if="data">
         <div v-if="data.isFuture" class="pb-4">
           <div class="px-2 py-1 rounded-md bg-yellow-200 dark:bg-yellow-800 text-slate-800 dark:text-slate-200">
-            You have an upcoming {{ data.updates[0].updateType }} {{ timeToDaysString(data.updates[0].updateTime, data.timestamp) }}. Good luck!
+            You have an upcoming {{ data.updates[0].updateType }} {{ timeToDaysString(data.updates[0].updateTime, checkedTime) }}. Good luck!
           </div>
         </div>
         <div v-else-if="data.isRemind" class="pb-4">
@@ -64,9 +76,25 @@ import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUt
           />
         </div>
 
-        <h3 class="text-2xl drop-shadow-2xl font-bold text-slate-800 dark:text-slate-200">
-          Updates
-        </h3>
+        <div 
+          v-if="data.updates[0].updateType === updateTypes.ACCEPT_OFFER"
+          class="pt-2"
+        >
+          <h3 class="pt-2 pb-1 text-2xl drop-shadow-2xl font-bold text-slate-800 dark:text-slate-200">
+            Updates
+          </h3>
+        </div>
+        <div v-else class="grid grid-cols-[1fr_auto] pt-2">
+          <h3 class="pt-2 pb-1 text-2xl drop-shadow-2xl font-bold text-slate-800 dark:text-slate-200">
+            Updates
+          </h3>
+          <Button 
+            label="Add Update"
+            class="block font-bold"
+            @click="() => showAddUpdate = true"
+          />
+        </div>
+        
         <div v-if="data.updates[0].updateTime === -1">
           <div class="text-lg font-bold text-slate-800 dark:text-slate-200">
             You haven't applied to this job yet.
@@ -78,7 +106,13 @@ import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUt
               {{ capitaliseFirst(update.updateType) }}
             </h4>
             <div class="text-slate-800 dark:text-slate-200">
-              {{ capitaliseFirst(timeToDaysString(update.updateTime, data.timestamp)) }}
+              {{ capitaliseFirst(timeToDaysString(update.updateTime, checkedTime)) }}
+            </div>
+            <div class="pb-4">
+              <MultiLine 
+                :text="update.updateNotes || ''"
+                line-class="text-slate-800 dark:text-slate-200"
+              />
             </div>
           </div>
         </div>

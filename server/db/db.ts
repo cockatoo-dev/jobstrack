@@ -1,10 +1,11 @@
 import { drizzle } from 'drizzle-orm/better-sqlite3'
 import Database from 'better-sqlite3'
+import * as schema from './schema'
 import { jobs, updates, usersBeta, usersInfo } from './schema'
-import { and, asc, desc, eq } from 'drizzle-orm'
+import { and, desc, eq } from 'drizzle-orm'
 
 const sqlite = new Database(process.cwd() + '/localDB.db')
-const db = drizzle(sqlite)
+const db = drizzle(sqlite, {schema})
 
 export const createUserBeta = async (
   username: string, passwordHash: string
@@ -18,6 +19,7 @@ export const createUserBeta = async (
     await db.insert(usersInfo).values({
       userId,
       username,
+      remindFuture: true,
       remindDays: 14,
       remindOfferDays: 3
     })
@@ -82,6 +84,7 @@ export const getUserIdBeta = async (username: string) => {
 export const getUserInfo = async (userId: string) => {
   const data = await db.select({
     username: usersInfo.username,
+    remindFuture: usersInfo.remindFuture,
     remindDays: usersInfo.remindDays,
     remindOfferDays: usersInfo.remindOfferDays
   })
@@ -100,10 +103,11 @@ export const editUserPasswordBeta = async (
 
 export const editUserSettings = async (
   userId: string,
+  remindFuture: boolean,
   remindDays: number, 
   remindOfferDays: number
 ) => {
-  await db.update(usersInfo).set({remindDays, remindOfferDays})
+  await db.update(usersInfo).set({remindFuture, remindDays, remindOfferDays})
   .where(eq(usersInfo.userId, userId))
 }
 
@@ -111,9 +115,7 @@ export const createJob = async (
   userId: string,
   companyName: string,
   jobTitle: string,
-  jobDescription: string,
-  lastUpdateType: string,
-  lastUpdateTime: number
+  jobDescription: string
 ) => {
   const jobId = crypto.randomUUID()
   await db.insert(jobs).values({
@@ -122,31 +124,23 @@ export const createJob = async (
     companyName,
     jobTitle,
     jobDescription,
-    lastUpdateType,
-    lastUpdateTime,
     dismissRemind: false
   })
   return jobId
 }
 
-export const getJobById = async (jobId: string, userId: string) => {
-  return await db.select({
-    companyName: jobs.companyName,
-    jobTitle: jobs.jobTitle,
-    jobDescription: jobs.jobDescription,
-    dismissRemind: jobs.dismissRemind,
-    updateId: updates.updateId,
-    updateType: updates.updateType,
-    updateTime: updates.updateTime,
-    updateNotes: updates.updateNotes
+export const getJobData = async (jobId: string, userId: string) => {
+  return await db.query.jobs.findFirst({
+    where: and(
+      eq(jobs.jobId, jobId),
+      eq(jobs.userId, userId)
+    ),
+    with: {
+      updates: {
+        orderBy: desc(updates.updateTime)
+      }
+    }
   })
-  .from(jobs)
-  .leftJoin(updates, eq(updates.jobId, jobs.jobId))
-  .where(and(
-    eq(jobs.jobId, jobId),
-    eq(jobs.userId, userId)
-  ))
-  .orderBy(desc(updates.updateTime))
 }
 
 export const checkJobOwner = async (jobId: string, userId: string) => {
@@ -157,37 +151,51 @@ export const checkJobOwner = async (jobId: string, userId: string) => {
     eq(jobs.userId, userId)
   ))
 
-  return result.length >= 1
+  return result.length === 1
 }
 
-export const getJobData = async (jobId: string, userId: string) => {
+export const getUserJobs = async (userId: string) => {
   return await db.select({
     jobId: jobs.jobId,
     companyName: jobs.companyName,
-    jobTitle: jobs.jobTitle,
-    dismissRemind: jobs.dismissRemind,
-    lastUpdateType: jobs.lastUpdateType,
-    lastUpdateTime: jobs.lastUpdateTime
-  })
-  .from(jobs)
-  .where(and(
-    eq(jobs.jobId, jobId),
-    eq(jobs.userId, userId)
-  ))
-}
-
-export const getJobsByUser = async (userId: string) => {
-  return await db.select({
-    jobId: jobs.jobId,
-    companyName: jobs.companyName,
-    jobTitle: jobs.jobTitle,
-    dismissRemind: jobs.dismissRemind,
-    lastUpdateType: jobs.lastUpdateType,
-    lastUpdateTime: jobs.lastUpdateTime
+    jobTitle: jobs.jobTitle
   })
   .from(jobs)
   .where(eq(jobs.userId, userId))
-  .orderBy(asc(jobs.companyName))
+}
+
+export const getJobUpdates = async (jobId: string) => {
+  return await db.select({
+    updateId: updates.updateId,
+    updateType: updates.updateType,
+    updateTime: updates.updateTime,
+    updateDay: updates.updateDay
+  })
+  .from(updates)
+  .where(eq(updates.jobId, jobId))
+  .orderBy(updates.updateTime)
+}
+
+export const getDashboardJobs = async (userId: string) => {
+  return await db.query.jobs.findMany({
+    columns: {
+      jobId: true,
+      companyName: true,
+      jobTitle: true,
+      dismissRemind: true,
+    },
+    where: eq(jobs.userId, userId),
+    with: {
+      updates: {
+        columns: {
+          updateType: true,
+          updateTime: true,
+          updateDay: true
+        },
+        orderBy: desc(updates.updateTime)
+      }
+    }
+  })
 }
 
 export const editJob = async (
@@ -222,26 +230,29 @@ export const setJobReminder = async (
   ))
 }
 
-export const setJobLastUpdate = async (
-  jobId: string,
-  userId: string,
-  lastUpdateType: string,
-  lastUpdateTime: number
-) => {
-  await db.update(jobs).set({
-    lastUpdateTime,
-    lastUpdateType
-  })
-  .where(and(
-    eq(jobs.jobId, jobId),
-    eq(jobs.userId, userId)
-  ))
-}
+// export const setJobLastUpdate = async (
+//   jobId: string,
+//   userId: string,
+//   lastUpdateType: string,
+//   lastUpdateTime: number,
+//   lastUpdateDay: number
+// ) => {
+//   await db.update(jobs).set({
+//     lastUpdateTime,
+//     lastUpdateType,
+//     lastUpdateDay
+//   })
+//   .where(and(
+//     eq(jobs.jobId, jobId),
+//     eq(jobs.userId, userId)
+//   ))
+// }
 
 export const addUpdate = async (
   jobId: string,
   updateType: string,
   updateTime: number,
+  updateDay: number,
   updateNotes: string
 ) => {
   const updateId = crypto.randomUUID()
@@ -250,6 +261,7 @@ export const addUpdate = async (
     jobId,
     updateType,
     updateTime,
+    updateDay,
     updateNotes
   })
   return updateId

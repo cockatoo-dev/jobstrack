@@ -1,11 +1,12 @@
 import { z } from "zod"
-import { addUpdate, getJobData, setJobLastUpdate } from "~/server/db/db"
+import { addUpdate, checkJobOwner, deleteUpdate, getJobUpdates } from "~/server/db/db"
 
 const bodySchema = z.object({
   jobId: z.string(),
   updateType: z.string(),
   isFuture: z.boolean(),
   updateTime: z.number(),
+  updateDay: z.number(),
   updateNotes: z.string()
 })
 
@@ -17,6 +18,8 @@ const isValidUpdate = (lastUpdate: string, newUpdate: string) => {
     lastUpdate === updateTypes.ONLINE_ASSESS ||
     lastUpdate === updateTypes.TAKE_HOME ||
     lastUpdate === updateTypes.INTERVIEW ||
+    lastUpdate === updateTypes.PHONE_INTERVIEW ||
+    lastUpdate === updateTypes.VIRTUAL_INTERVIEW ||
     lastUpdate === updateTypes.TECH_INTERVIEW ||
     lastUpdate === updateTypes.BEHAVE_INTERVIEW ||
     lastUpdate === updateTypes.ASSESS_CENTER ||
@@ -35,6 +38,23 @@ const isValidUpdate = (lastUpdate: string, newUpdate: string) => {
     )
   } else {
     return newUpdate !== updateTypes.NO_APPLICATION
+  }
+}
+
+const isValidFuture = (updateType: string) => {
+  if (
+    updateType === updateTypes.TAKE_HOME ||
+    updateType === updateTypes.INTERVIEW ||
+    updateType === updateTypes.PHONE_INTERVIEW ||
+    updateType === updateTypes.VIRTUAL_INTERVIEW ||
+    updateType === updateTypes.TECH_INTERVIEW ||
+    updateType === updateTypes.BEHAVE_INTERVIEW ||
+    updateType === updateTypes.FINAL_INTERVIEW ||
+    updateType === updateTypes.ASSESS_CENTER
+  ) {
+    return true
+  } else {
+    return false
   }
 }
 
@@ -58,33 +78,62 @@ export default defineEventHandler(async (e) => {
     })
   }
 
-  const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
-
-  let checkedTime = 0
-
-  if (bodyData.data.isFuture && (Date.now() - bodyData.data.updateTime < 86400000)) {
-    checkedTime = bodyData.data.updateTime
-  } else if (checkTime(bodyData.data.updateTime)) {
-    checkedTime = bodyData.data.updateTime
-  } else {
-    checkedTime = dayTimestamp()
+  if (bodyData.data.updateNotes.length > 1000) {
+    throw createError({
+      status: 400,
+      message: "Text in some fields is too long."
+    })
   }
 
-  const jobData = await getJobData(bodyData.data.jobId, userId)
+  if (bodyData.data.isFuture && !isValidFuture(bodyData.data.updateType)) {
+    throw createError({
+      status: 400,
+      message: "Future update time is not allowed for this update type."
+    })
+  }
 
-  if (jobData.length === 1) {
-    if (isValidUpdate(jobData[0].lastUpdateType, bodyData.data.updateType)) {
+  const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
+
+  let checkedTime = -1
+  let checkedDay = -1
+
+  if (bodyData.data.isFuture) {
+    if (Date.now() - bodyData.data.updateTime > DAY) {
+      checkedTime = Date.now()
+    } else {
+      checkedTime = bodyData.data.updateTime
+    }
+    if (dayTimestamp() - bodyData.data.updateDay > DAY) {
+      checkedDay = dayTimestamp()
+    } else {
+      checkedDay = bodyData.data.updateDay
+    }
+  } else {
+    checkedTime = getCheckedTime(bodyData.data.updateTime)
+    checkedDay = getCheckedDay(bodyData.data.updateDay)
+  }
+
+  if (!await checkJobOwner(bodyData.data.jobId, userId)) {
+    throw createError({
+      status: 400,
+      message: "Unknown job ID"
+    })
+  }
+
+  const updatesData = await getJobUpdates(bodyData.data.jobId)
+
+  if (updatesData.length >= limits.UPDATE_LIMIT) {
+    await deleteUpdate(bodyData.data.jobId, updatesData[9].updateId)
+  }
+
+  if (updatesData.length >= 1) {
+    if (isValidUpdate(updatesData[0].updateType, bodyData.data.updateType)) {
       await addUpdate(
         bodyData.data.jobId, 
         bodyData.data.updateType, 
         checkedTime,
+        checkedDay,
         bodyData.data.updateNotes
-      )
-      await setJobLastUpdate(
-        bodyData.data.jobId,
-        userId,
-        bodyData.data.updateType,
-        checkedTime
       )
     } else {
       throw createError({
@@ -93,9 +142,19 @@ export default defineEventHandler(async (e) => {
       })
     }
   } else {
-    throw createError({
-      status: 400,
-      message: "Unknown job ID."
-    })
+    if (isValidUpdate(updateTypes.NO_APPLICATION, bodyData.data.updateType)) {
+      await addUpdate(
+        bodyData.data.jobId, 
+        bodyData.data.updateType, 
+        checkedTime,
+        checkedDay,
+        bodyData.data.updateNotes
+      )
+    } else {
+      throw createError({
+        status: 400,
+        message: "Invalid update type for this job."
+      })
+    }
   }
 })

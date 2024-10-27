@@ -8,15 +8,7 @@
     }
   })
 
-  const timestampInUse = computed(() => {
-    if (!data.value) {
-      return Date.now()
-    } else if (checkTime(data.value.timestamp)) {
-      return Date.now()
-    } else {
-      return data.value.timestamp
-    }
-  })
+  const checkedTime = useCheckedTime(data)
 
   const selectedView = ref("reminders")
   const remindersDisplay = ref<string[]>([])
@@ -87,7 +79,7 @@
     />
 
     <div class="w-full px-1 sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] pt-4 mx-auto">
-      <div class="text-lg sm:text-4xl text-slate-800 dark:text-slate-200">
+      <div class="text-lg sm:text-4xl pb-1 text-slate-800 dark:text-slate-200">
         <span v-if="data && data.acceptJobs.length > 0">Congratulations!</span>
         <span v-else-if="data">Welcome back, {{ data.username }}.</span>
       </div>
@@ -126,7 +118,7 @@
                 <AccordionContent class="px-0">
                   <DashboardList 
                     beta
-                    :timestamp="timestampInUse"
+                    :timestamp="checkedTime"
                     :jobs="data.futureJobs"
                     :refresh-data="refresh"
                   />
@@ -141,7 +133,7 @@
                 <AccordionContent class="px-0">
                   <DashboardList 
                     beta
-                    :timestamp="timestampInUse"
+                    :timestamp="checkedTime"
                     :jobs="data.remindJobs"
                     :refresh-data="refresh"
                   />
@@ -164,7 +156,7 @@
                 <AccordionContent>
                   <DashboardList 
                     beta
-                    :timestamp="timestampInUse"
+                    :timestamp="checkedTime"
                     :jobs="data.acceptJobs"
                     :refresh-data="refresh"
                   />
@@ -179,7 +171,7 @@
                 <AccordionContent>
                   <DashboardList 
                     beta
-                    :timestamp="timestampInUse"
+                    :timestamp="checkedTime"
                     :jobs="data.offerJobs"
                     :refresh-data="refresh"
                   />
@@ -194,7 +186,7 @@
                 <AccordionContent>
                   <DashboardList 
                     beta
-                    :timestamp="timestampInUse"
+                    :timestamp="checkedTime"
                     :jobs="data.finalJobs"
                     :refresh-data="refresh"
                   />
@@ -209,7 +201,7 @@
                 <AccordionContent>
                   <DashboardList 
                     beta
-                    :timestamp=timestampInUse
+                    :timestamp=checkedTime
                     :jobs="data.interviewJobs"
                     :refresh-data="refresh"
                   />
@@ -224,7 +216,7 @@
                 <AccordionContent>
                   <DashboardList 
                     beta
-                    :timestamp="timestampInUse"
+                    :timestamp="checkedTime"
                     :jobs="data.appliedJobs"
                     :refresh-data="refresh"
                   />
@@ -239,7 +231,7 @@
                 <AccordionContent>
                   <DashboardList 
                     beta
-                    :timestamp="timestampInUse"
+                    :timestamp="checkedTime"
                     :jobs="data.notAppliedJobs"
                     :refresh-data="refresh"
                   />
@@ -254,7 +246,7 @@
                 <AccordionContent>
                   <DashboardList 
                     beta
-                    :timestamp="timestampInUse"
+                    :timestamp="checkedTime"
                     :jobs="data.notConsideredJobs"
                     :refresh-data="refresh"
                   />
@@ -269,7 +261,7 @@
         <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200">All Jobs</h3>
         <DashboardList
           beta
-          :timestamp="timestampInUse"
+          :timestamp="checkedTime"
           :jobs="data?.allJobs || []" 
           :refresh-data="refresh" 
         />
