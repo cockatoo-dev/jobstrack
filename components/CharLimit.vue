@@ -13,7 +13,7 @@
   >
     <span 
       class="transition-colors duration-300"
-      :class="str.length >= limit ? 'text-red-700 dark:text-red-300' : 'text-slate-800 dark:text-slate-200'"
+      :class="str.length >= limit ? 'text-red-500' : 'text-slate-800 dark:text-slate-200'"
     >
       {{ str.length }}/{{ limit }}
     </span>

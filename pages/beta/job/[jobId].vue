@@ -9,6 +9,20 @@ import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUt
     query: {jobId: route.params.jobId}
   })
 
+  const lastUpdateType = computed(() => {
+    if (!data.value) {
+      return updateTypes.NO_APPLICATION
+    }
+
+    if (data.value.hasAcceptOffer) {
+      return updateTypes.ACCEPT_OFFER
+    } else if (data.value.updates.length === 0) {
+      return updateTypes.NO_APPLICATION
+    } else {
+      return data.value.updates[0].updateType
+    }
+  })
+
   const checkedTime = useCheckedTime(data)
 
   watch(error, async () => {
@@ -28,7 +42,7 @@ import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUt
       beta
       :timestamp="checkedTime"
       :job-id="route.params.jobId"
-      :last-update-type="data?.updates[0].updateType || updateTypes.NO_APPLICATION"
+      :last-update-type="lastUpdateType"
       :refresh-data="refresh"
     />
 
@@ -37,17 +51,22 @@ import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUt
     >
       <Button link as="router-link" to="/beta/dashboard" label="Back to Dashboard" />
       <div v-if="data">
-        <div v-if="data.isFuture" class="pb-4">
-          <div class="px-2 py-1 rounded-md bg-yellow-200 dark:bg-yellow-800 text-slate-800 dark:text-slate-200">
+        <div v-if="data.isFuture && data.futureCount > 1" class="pb-2">
+          <div class="px-2 py-1 rounded-lg bg-yellow-200 dark:bg-yellow-800 text-slate-800 dark:text-slate-200">
+            You have {{ data.futureCount }} upcoming events. Good luck!
+          </div>
+        </div>
+        <div v-else-if="data.isFuture && data.updates.length > 0" class="pb-2">
+          <div class="px-2 py-1 rounded-lg bg-yellow-200 dark:bg-yellow-800 text-slate-800 dark:text-slate-200">
             You have an upcoming {{ data.updates[0].updateType }} {{ timeToDaysString(data.updates[0].updateTime, checkedTime) }}. Good luck!
           </div>
         </div>
-        <div v-else-if="data.isRemind" class="pb-4">
-          <div class="px-2 py-1 rounded-md bg-fuchsia-200 dark:bg-fuchsia-800 text-slate-800 dark:text-slate-200">
-            <span v-if="data.updates[0].updateType === updateTypes.NO_APPLICATION">
+        <div v-else-if="data.isRemind" class="pb-2">
+          <div class="px-2 py-1 rounded-lg bg-fuchsia-200 dark:bg-fuchsia-800 text-slate-800 dark:text-slate-200">
+            <span v-if="lastUpdateType === updateTypes.NO_APPLICATION">
               You haven't applied to this job yet. It's a good idea to send your application as soon as possible, then add an update here when you're done.
             </span>
-            <span v-else-if="data.updates[0].updateType === updateTypes.RECEIVE_OFFER">
+            <span v-else-if="lastUpdateType === updateTypes.RECEIVE_OFFER">
               You recently received an offer for this job. It's best not to dwell on your decision for too long.
             </span>
             <span v-else>
@@ -58,8 +77,8 @@ import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUt
         <div
           class="px-4 py-3 rounded-2xl border-4 drop-shadow-md"
           :class="(
-            data?.updates[0].updateType === updateTypes.ACCEPT_OFFER ? 'border-lime-500' : 
-            data?.updates[0].updateType === updateTypes.RECEIVE_OFFER ? 'border-fuchsia-500' : 'border-slate-500'
+            data.hasAcceptOffer ? 'border-lime-500' : 
+            lastUpdateType === updateTypes.RECEIVE_OFFER ? 'border-fuchsia-500' : 'border-slate-500'
           )"
         >
           <h2 class="text-4xl pb-2 font-bold text-slate-800 dark:text-slate-200">
@@ -77,10 +96,10 @@ import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUt
         </div>
 
         <div 
-          v-if="data.updates[0].updateType === updateTypes.ACCEPT_OFFER"
+          v-if="lastUpdateType === updateTypes.ACCEPT_OFFER"
           class="pt-2"
         >
-          <h3 class="pt-2 pb-1 text-2xl drop-shadow-2xl font-bold text-slate-800 dark:text-slate-200">
+          <h3 class="pt-2 pb-1text-2xl drop-shadow-2xl font-bold text-slate-800 dark:text-slate-200">
             Updates
           </h3>
         </div>
@@ -95,14 +114,14 @@ import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUt
           />
         </div>
         
-        <div v-if="data.updates[0].updateTime === -1">
+        <div v-if="lastUpdateType === updateTypes.NO_APPLICATION">
           <div class="text-lg font-bold text-slate-800 dark:text-slate-200">
             You haven't applied to this job yet.
           </div>
         </div>
-        <div v-else>
+        <div v-else class="pt-2">
           <div v-for="update of data.updates" :key="update.updateId">
-            <h4 class="text-lg font-bold text-slate-800 dark:text-slate-200">
+            <h4 class="border-t-2 border-slate-200 dark:border-slate-800 text-lg font-bold text-slate-800 dark:text-slate-200">
               {{ capitaliseFirst(update.updateType) }}
             </h4>
             <div class="text-slate-800 dark:text-slate-200">

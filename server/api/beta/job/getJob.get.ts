@@ -19,6 +19,8 @@ export default defineEventHandler(async (e) => {
 
   let isFuture = false
   let isRemind = false
+  let futureCount = 0
+  let hasAcceptOffer = false
 
   const dbData = await getJobData(queryData.data.jobId, userId)
   if (!dbData) {
@@ -35,8 +37,20 @@ export default defineEventHandler(async (e) => {
     updates: dbData.updates
   }
 
-  if (result.updates[0].updateTime > Date.now()) {
-    isFuture = true
+  if (result.updates.length === 0) {
+    isRemind = !result.dismissRemind
+  } else {
+    for (const update of dbData.updates) {
+      if (update.updateType === updateTypes.ACCEPT_OFFER) {
+        hasAcceptOffer = true
+      } else if (update.updateTime > Date.now()) {
+        futureCount += 1
+      }
+    }
+  }
+  
+  if (futureCount > 0 && !hasAcceptOffer) {
+    isFuture = userInfo.remindFuture
   } else if (result.dismissRemind) {
     isRemind = false
   } else if (checkRemind(
@@ -44,7 +58,7 @@ export default defineEventHandler(async (e) => {
     result.updates[0].updateTime,
     userInfo.remindDays,
     userInfo.remindOfferDays
-  )) {
+  ) && !hasAcceptOffer) {
     isRemind = true
   }
 
@@ -52,6 +66,8 @@ export default defineEventHandler(async (e) => {
     timestamp: Date.now(),
     isFuture,
     isRemind,
+    futureCount,
+    hasAcceptOffer,
     ...result
   }
 })

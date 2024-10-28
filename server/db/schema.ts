@@ -28,9 +28,6 @@ export const jobs = sqliteTable("jobs", {
   companyName: text("companyName").notNull(),
   jobTitle: text("jobTitle").notNull(),
   jobDescription: text("jobDescription").notNull(),
-  // lastUpdateType: text("lastUpdateType").notNull(),
-  // lastUpdateTime: int("lastUpdateTime").notNull(),
-  // lastUpdateDay: int("lastUpdateDay").notNull(),
   dismissRemind: int("dismissRemind", {mode: 'boolean'}).notNull()
 })
 

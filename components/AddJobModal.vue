@@ -28,19 +28,19 @@
   const submitForm = async () => {
     formLoading.value = true
     if (companyName.value.length > 100) {
-      errorMessage.value = "Company name is too long. (maximum 100 characters)"
+      errorMessage.value = "Company name is too long (maximum 100 characters)."
       formLoading.value = false
       return
     } else if (jobTitle.value.length > 100) {
-      errorMessage.value = "Job title is too long. (maximum 100 characters)"
+      errorMessage.value = "Job title is too long (maximum 100 characters)."
       formLoading.value = false
       return
     } else if (jobDescription.value.length > 10000) {
-      errorMessage.value = "Job description is too long. (maximum 10000 characters)"
+      errorMessage.value = "Job description is too long (maximum 10000 characters)."
       formLoading.value = false
       return
     } else if (applicationNotes.value.length > 1000) {
-      errorMessage.value = "Application notes is too long. (maximumn 1000 characters)"
+      errorMessage.value = "Application notes is too long (maximumn 1000 characters)."
       formLoading.value = false
       return
     }
@@ -95,14 +95,14 @@
     header="Add Job"
   >
     <template #container>
-      <div class="p-4 sm:p-8 overflow-auto">
+      <div class="p-2 sm:p-8 overflow-auto">
         <h2 class="text-slate-800 dark:text-slate-200 text-3xl font-bold">Add a new job.</h2>
         <form @submit.prevent="submitForm">
           <div class="pb-2 text-sm text-slate-800 dark:text-slate-200">
             Fields marked with a * are required.
           </div>
 
-          <div class="pb-4">
+          <div class="pb-2">
             <label 
               for="add-companyName"
               class="block pb-1 text-slate-800 dark:text-slate-200"
@@ -120,7 +120,7 @@
             <CharLimit :str="companyName" :limit="100" :show-length="50" />
           </div>
 
-          <div class="pb-4">
+          <div class="pb-2">
             <label 
               for="add-jobTitle"
               class="block pb-1 text-slate-800 dark:text-slate-200"
@@ -138,7 +138,7 @@
             <CharLimit :str="jobTitle" :limit="100" :show-length="50" />
           </div>
 
-          <div class="pb-4">
+          <div class="pb-2">
             <label 
               for="add-jobDescription"
               class="block pb-1 text-slate-800 dark:text-slate-200"
@@ -177,7 +177,7 @@
             </div>
           </div>
 
-          <div v-if="hasApplied" class="pb-4">
+          <div v-if="hasApplied" class="pb-2">
             <label 
               for="add-applicationNotes"
               class="block pb-1 text-slate-800 dark:text-slate-200"

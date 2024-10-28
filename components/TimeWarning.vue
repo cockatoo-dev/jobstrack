@@ -1,12 +1,19 @@
 <script setup lang="ts">
-import { checkTime } from '~/utils/clientUtils';
-
   const props = defineProps<{
     serverTimestamp?: number
   }>()
 
   const timeWarning = computed(() => {
-    return !checkTime(props.serverTimestamp)
+    const HOUR = 3600000
+    if (!props.serverTimestamp) {
+      return false
+    } else if (Date.now() - props.serverTimestamp > HOUR) {
+      return true
+    } else if (props.serverTimestamp - Date.now() > HOUR) {
+      return true
+    } else {
+      return false
+    }
   })
 </script>
 

@@ -5,7 +5,7 @@ import { sha256base64 } from 'ohash'
 
 export const DAY = 86400000
 export const limits = {
-  JOB_LIMIT: 100,
+  JOB_LIMIT: 50,
   UPDATE_LIMIT: 10
 }
 
@@ -34,6 +34,8 @@ export type dashboardJobItem = {
   jobTitle: string,
   updateType: string,
   updateTime: number,
+  futureCount: number,
+  hasAcceptOffer: boolean,
   isFuture: boolean,
   isRemind: boolean
 }

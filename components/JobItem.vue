@@ -19,7 +19,8 @@
     return getUpdateAction(
       props.jobData.updateType, 
       props.jobData.updateTime,
-      props.timestamp
+      props.timestamp,
+      props.jobData.hasAcceptOffer ? 0 : props.jobData.futureCount
     )
   })
 </script>
@@ -29,7 +30,7 @@
     <div
       class="w-full max-w-64 sm:w-64 h-56 mx-auto border-4 rounded-lg drop-shadow-md transition-colors duration-300"
       :class="(
-        jobData.updateType === updateTypes.ACCEPT_OFFER ? 'border-lime-500 hover:bg-lime-100 dark:hover:bg-lime-900' : 
+        jobData.hasAcceptOffer ? 'border-lime-500 hover:bg-lime-100 dark:hover:bg-lime-900' : 
         jobData.updateType === updateTypes.RECEIVE_OFFER ? 'border-fuchsia-500 hover:bg-fuchsia-100 dark:hover:bg-fuchsia-900' : 'border-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900'
       )"
     >
@@ -50,7 +51,7 @@
         </div>
       </NuxtLink>
       <NuxtLink
-        v-if="jobData.updateType === updateTypes.ACCEPT_OFFER"
+        v-if="jobData.hasAcceptOffer"
         :to="`${beta ? '/beta' : ''}/job/${props.jobData.jobId}`"
         class="block w-full h-[4.5rem] rounded-b p-2 bg-lime-300 dark:bg-lime-700 border-t-2 border-t-lime-300 dark:border-t-lime-700 text-slate-800 dark:text-slate-200 text-center font-bold"
       >

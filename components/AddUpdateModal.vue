@@ -98,7 +98,7 @@
   const submitForm = async () => {
     formLoading.value = true
     if (updateNotes.value.length > 1000) {
-      errorMessage.value = "Update notes is too long. (maximum 1000 characters)"
+      errorMessage.value = "Update notes is too long (maximum 1000 characters)."
       formLoading.value = false
       return
     } else if (updateDate.value.getTime() < limitDate.value.getTime()) {

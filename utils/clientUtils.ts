@@ -1,6 +1,6 @@
 export const DAY = 86400000
 export const limits = {
-  JOB_LIMIT: 100,
+  JOB_LIMIT: 50,
   UPDATE_LIMIT: 10
 }
 
@@ -79,14 +79,23 @@ export const timeToDaysString = (time: number, nowMsec: number) => {
   }
 }
 
-export const getUpdateAction = (updateType: string, updateTime: number, timestamp: number) => {
+export const getUpdateAction = (
+  updateType: string, 
+  updateTime: number, 
+  timestamp: number,
+  futureCount: number
+) => {
+  if (futureCount > 1) {
+    return `You have ${futureCount} upcoming events.`
+  }
+  
   let daysString = ""
   if (updateType !== updateTypes.NO_APPLICATION) {
     daysString = timeToDaysString(updateTime, timestamp)
   }
   
   if (updateType === updateTypes.APPLICATION_SENT) {
-    return `You submitted your application ${daysString}.`
+    return `You sent your application ${daysString}.`
   } else if (updateType === updateTypes.ONLINE_ASSESS) {
     return `You completed an online assessment ${daysString}.`
   } else if (updateType === updateTypes.TAKE_HOME) {
@@ -162,6 +171,8 @@ export type dashboardJobItem = {
   jobTitle: string,
   updateType: string,
   updateTime: number,
+  futureCount: number,
+  hasAcceptOffer: boolean,
   isFuture: boolean,
   isRemind: boolean
 }

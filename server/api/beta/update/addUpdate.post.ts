@@ -122,6 +122,15 @@ export default defineEventHandler(async (e) => {
 
   const updatesData = await getJobUpdates(bodyData.data.jobId)
 
+  for (const update of updatesData) {
+    if (update.updateType === updateTypes.ACCEPT_OFFER) {
+      throw createError({
+        status: 400,
+        message: "Invalid update type for this job."
+      })
+    }
+  }
+  
   if (updatesData.length >= limits.UPDATE_LIMIT) {
     await deleteUpdate(bodyData.data.jobId, updatesData[9].updateId)
   }
