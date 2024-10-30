@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUtils';
 
   const route = useRoute()
   const showAddUpdate = ref(false)
+  const showUpdateLimit = ref(false)
 
   const { data, error, refresh } = useFetch("/api/beta/job/getJob", {
     method: 'get',
@@ -45,6 +45,42 @@ import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUt
       :last-update-type="lastUpdateType"
       :refresh-data="refresh"
     />
+    
+    <Dialog
+      v-model:visible="showUpdateLimit"
+      modal
+      class="w-11/12 sm:w-[37rem]"
+    >
+      <template #container>
+        <div class="p-2 sm:p-4">
+          <div class="text-slate-800 dark:text-slate-200 text-xl font-bold">
+            Update Limit Reached.
+          </div>
+          <div class="text-slate-800 dark:text-slate-200">
+            You've reached the maximum number of updates for this job. 
+            When you create a new update for this job, the oldest update for this job will be deleted.
+          </div>
+          <div class="pt-2 flex gap-2">
+            <Button 
+              type="button"
+              label="Proceed"
+              class="block"
+              @click="() => {
+                showUpdateLimit = false
+                showAddUpdate = true
+              }"
+            />
+            <Button 
+              type="button"
+              link
+              label="Cancel"
+              class="block"
+              @click="() => {showUpdateLimit = false}"
+            />
+          </div>
+        </div>
+      </template>
+    </Dialog>
 
     <div 
       class="w-full sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] p-2 sm:p-0 mx-auto"
@@ -110,7 +146,9 @@ import { capitaliseFirst, timeToDaysString, updateTypes } from '~/utils/clientUt
           <Button 
             label="Add Update"
             class="block font-bold"
-            @click="() => showAddUpdate = true"
+            @click="() => {
+              showUpdateLimit = true
+            }"
           />
         </div>
         

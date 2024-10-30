@@ -181,3 +181,10 @@ export type clientUserSettings = {
   remindDays: number,
   remindOfferDays: number
 }
+
+export type jobEditData = {
+  jobId: string,
+  companyName: string,
+  jobTitle: string,
+  jobDescription: string
+}

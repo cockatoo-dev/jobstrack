@@ -1,5 +1,6 @@
 <script lang="ts" setup>
   const showAddJob = ref(false)
+  const showJobLimit = ref(false)
 
   const { data, error, refresh } = useFetch("/api/beta/dashboard")
   watch(error, async () => {
@@ -78,6 +79,33 @@
       :refresh-data="refresh"
     />
 
+    <Dialog
+      v-model:visible="showJobLimit"
+      modal
+      class="w-11/12 sm:w-[37rem]"
+    >
+      <template #container>
+        <div class="p-2 sm:p-4">
+          <div class="text-slate-800 dark:text-slate-200 text-xl font-bold">
+            Job Limit Reached.
+          </div>
+          <div class="text-slate-800 dark:text-slate-200">
+            You've reached the maximum number of jobs for your account.
+            Consider deleting a job which you are no longer considering, then return here to add a new job.
+          </div>
+          <div class="pt-2">
+            <Button 
+              type="button"
+              link
+              label="Cancel"
+              class="block"
+              @click="() => {showJobLimit = false}"
+            />
+          </div>
+        </div>
+      </template>
+    </Dialog>
+
     <div class="w-full px-1 sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] pt-4 mx-auto">
       <div class="text-lg sm:text-4xl pb-1 text-slate-800 dark:text-slate-200">
         <span v-if="data && data.acceptJobs.length > 0">Congratulations!</span>
@@ -94,7 +122,13 @@
             <Button 
               class="block h-full !font-bold"
               label="Add Job"
-              @click="() => showAddJob = true"
+              @click="() => {
+                if (data && data.allJobs.length >= limits.JOB_LIMIT) {
+                  showJobLimit = true
+                } else {
+                  showAddJob = true
+                }
+              }"
             >
               <div class="font-bold">
                 Add Job
