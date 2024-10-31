@@ -8,8 +8,6 @@
     refreshData: () => Promise<void>
   }>()
 
-  const showDismiss = ref(false)
-
   const notConsidered = computed(() => {
     return props.jobData.updateType === updateTypes.REJECT ||
     props.jobData.updateType === updateTypes.WAITLIST ||
@@ -64,23 +62,15 @@
       >
         {{ updateText }}
       </NuxtLink>
-      <div 
+      <NuxtLink 
         v-else-if="jobData.isRemind"
-        class="w-full h-[4.5rem] rounded-b bg-fuchsia-300 dark:bg-fuchsia-700 border-t-2 border-t-fuchsia-300 dark:border-t-fuchsia-700"
-        @mouseenter="() => showDismiss = true"
-        @mouseleave="() => showDismiss = false"
+        :to="`${beta ? '/beta' : ''}/job/${props.jobData.jobId}`"
+        class="block w-full h-[4.5rem] rounded-b bg-fuchsia-300 dark:bg-fuchsia-700 border-t-2 border-t-fuchsia-300 dark:border-t-fuchsia-700"
       >
-        <div class="absolute top-36 rounded-b left-0 w-full h-[4.5rem] pt-[0.875rem] mx-auto bg-fuchsia-300 dark:bg-fuchsia-700 border-t-2 border-t-fuchsia-300 dark:border-t-fuchsia-700 transition-opacity duration-200 opacity-0 hover:opacity-100 text-center">
-          <Button
-            label="Dismiss Reminder"
-            @click="refreshData"
-          />
-          
-        </div>
         <div class="p-2 text-slate-800 dark:text-slate-200 font-bold text-center">
           {{ updateText }}
         </div>
-      </div>
+      </NuxtLink>
 
       <NuxtLink 
         v-else
