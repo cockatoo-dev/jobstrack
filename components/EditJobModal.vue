@@ -95,13 +95,13 @@
 
           <div class="pb-2">
             <label 
-              for="add-companyName"
+              for="edit-companyName"
               class="block pb-1 text-slate-800 dark:text-slate-200"
             >
               Company Name*
             </label>
             <InputText
-              id="add-companyName"
+              id="edit-companyName"
               v-model="companyName"
               required
               :invalid="companyName.length > 100"
@@ -113,13 +113,13 @@
 
           <div class="pb-2">
             <label 
-              for="add-jobTitle"
+              for="edit-jobTitle"
               class="block pb-1 text-slate-800 dark:text-slate-200"
             >
               Job Title*
             </label>
             <InputText
-              id="add-jobTitle"
+              id="edit-jobTitle"
               v-model="jobTitle"
               required
               :invalid="jobTitle.length > 100"
@@ -131,13 +131,13 @@
 
           <div class="pb-2">
             <label 
-              for="add-jobDescription"
+              for="edit-jobDescription"
               class="block pb-1 text-slate-800 dark:text-slate-200"
             >
               <div>Job Description</div>
             </label>
             <Textarea
-              id="add-jobDescription"
+              id="edit-jobDescription"
               v-model="jobDescription"
               :invalid="companyName.length > 10000"
               class="block"

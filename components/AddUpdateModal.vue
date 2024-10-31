@@ -8,6 +8,7 @@
     timestamp: number
     jobId: string | string[]
     lastUpdateType: string
+    hasDismissRemind: boolean
     refreshData: () => Promise<void>
   }>()
 
@@ -121,7 +122,8 @@
             isFuture,
             updateTime,
             updateDay,
-            updateNotes: updateNotes.value
+            updateNotes: updateNotes.value,
+            hasDismissRemind: props.hasDismissRemind
           }
         })
         await props.refreshData()
@@ -172,8 +174,8 @@
               Update Type*
             </label>
             <Select 
-              id="update-updateType"
               v-model="updateType"
+              input-id="update-updateType"
               :options="updateSelection"
               required
               class="block"
@@ -211,8 +213,10 @@
               </label>
             </div>
             <div v-if="updateTimeOption === 'future'" class="pt-2">
+              <label class="hidden" for="update-updateDate">Select update date and time.</label>
               <DatePicker 
                 v-model="updateDate"
+                input-id="update-updateDate"
                 :min-date="limitDate"
                 :manual-input="false"
                 show-time

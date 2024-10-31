@@ -300,6 +300,7 @@
         <div v-if="data.allJobs.length > 0">
           <DashboardList
             beta
+            search
             :timestamp="checkedTime"
             :jobs="data?.allJobs || []" 
             :refresh-data="refresh" 

@@ -83,6 +83,7 @@
       :timestamp="checkedTime"
       :job-id="route.params.jobId"
       :last-update-type="lastUpdateType"
+      :has-dismiss-remind="data?.dismissRemind || false"
       :refresh-data="refresh"
     />
 
@@ -136,17 +137,17 @@
       <Button text as="router-link" to="/beta/dashboard" label="Back to Dashboard" />
       <div v-if="data" class="pt-2">
         <div v-if="data.isFuture && data.futureCount > 1" class="pb-2">
-          <div class="px-2 py-1 rounded-lg bg-yellow-200 dark:bg-yellow-800 text-slate-800 dark:text-slate-200">
+          <div class="px-2 py-1 rounded-lg border-1 border-yellow-500 bg-yellow-200 dark:bg-yellow-800 text-slate-800 dark:text-slate-200">
             You have {{ data.futureCount }} upcoming events. Good luck!
           </div>
         </div>
         <div v-else-if="data.isFuture && data.updates.length > 0" class="pb-2">
-          <div class="px-2 py-1 rounded-lg bg-yellow-200 dark:bg-yellow-800 text-slate-800 dark:text-slate-200">
+          <div class="px-2 py-1 rounded-lg border-2 border-yellow-500 bg-yellow-200 dark:bg-yellow-800 text-slate-800 dark:text-slate-200">
             You have an upcoming {{ data.updates[0].updateType }} {{ timeToDaysString(data.updates[0].updateTime, checkedTime) }}. Good luck!
           </div>
         </div>
         <div v-else-if="data.isRemind" class="pb-2">
-          <div class="px-2 py-1 rounded-lg bg-fuchsia-200 dark:bg-fuchsia-800 text-slate-800 dark:text-slate-200">
+          <div class="px-2 py-1 rounded-lg border-2 border-fuchsia-500 bg-fuchsia-200 dark:bg-fuchsia-800 text-slate-800 dark:text-slate-200">
             <span v-if="lastUpdateType === updateTypes.NO_APPLICATION">
               You haven't applied to this job yet. It's a good idea to send your application as soon as possible, then add an update here when you're done.
             </span>
@@ -159,7 +160,7 @@
           </div>
         </div>
         <div
-          class="px-4 py-3 rounded-2xl border-4 drop-shadow-md"
+          class="px-4 py-3 rounded-2xl border-4"
           :class="(
             data.hasAcceptOffer ? 'border-lime-500' : 
             lastUpdateType === updateTypes.RECEIVE_OFFER ? 'border-fuchsia-500' : 'border-slate-500'
@@ -183,7 +184,7 @@
           <Button 
             type="button"
             text
-            label="Options"
+            label="Job Options"
             class="block"
             @click="() => {showMobileOptions = true}"
           />
@@ -241,46 +242,56 @@
                 />
               </div>
             </div>
-            <nav class="p-2 text-left">
-              <div>
+            <nav class="px-2 pb-2 text-left">
+              <div class="pt-2">
                 <Button 
                   v-if="data && data.dismissRemind"
                   type="button"
                   label="Turn On Reminders"
-                  class="block"
+                  fluid
                   :loading="remindLoading"
                   @click="() => {setDismissRemind(false).then(() => showMobileOptions = false)}"
-                />
+                >
+                  <div class="w-full text-left">Turn On Reminders</div>
+                </Button>
                 <Button 
                   v-else
                   type="button"
                   text
                   label="Turn Off Reminders"
-                  class="block"
+                  fluid
                   :loadkg="remindLoading"
                   @click="() => {setDismissRemind(true).then(() => showMobileOptions = false)}"
-                />
+                >
+                  <div class="w-full text-left">Turn Off Reminders</div>
+                </Button>
               </div>
-              <div>
+              <div class="pt-2">
                 <Button 
                   text 
                   label="Edit Job" 
+                  fluid
                   @click="() => {
                     showMobileOptions = false
                     showEditJob = true
                   }" 
-                />
+                >
+                  <div class="w-full text-left">Edit Job</div>
+                </Button>
               </div>
-              <div>
+              <div class="pt-2">
                 <Button 
                   text 
                   label="Delete Job"
                   severity="danger"
+                  fluid
                   @click="() => {
                     showMobileOptions = false
                     showDeleteJob = true
                   }"
-                />
+                >
+                  <div class="w-full text-left">Delete Job</div>
+                </Button>
               </div>
             </nav>
           </template>
@@ -302,13 +313,17 @@
             label="Add Update"
             class="block font-bold"
             @click="() => {
-              showUpdateLimit = true
+              if (data && data.updates.length > limits.UPDATE_LIMIT) {
+                showUpdateLimit = true
+              } else {
+                showAddUpdate = true
+              }
             }"
           />
         </div>
         
         <div v-if="lastUpdateType === updateTypes.NO_APPLICATION">
-          <div class="text-lg font-bold text-slate-800 dark:text-slate-200">
+          <div class="pt-2 text-lg font-bold text-slate-800 dark:text-slate-200">
             You haven't applied to this job yet.
           </div>
         </div>

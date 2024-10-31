@@ -31,7 +31,7 @@
 
 <template>
   <nav class="grid grid-cols-[1fr_auto] sm:hidden w-full px-2 py-1">
-    <NavLogo :beta="!showMobileNav" />
+    <NavLogo :beta />
     <div>
       <Button text label="Menu" @click="() => {showMobileNav = true}" />
     </div>
@@ -56,22 +56,28 @@
         <div>
           <Button 
             text 
-            label="User Settings" 
+            label="User Settings"
+            fluid
             @click="() => {
               showMobileNav = false
               alertFunction()
             }" 
-          />
+          >
+            <div class="w-full text-left">User Settings</div>
+          </Button>
         </div>
         <div>
           <Button 
             text 
             label="Logout" 
+            fluid
             @click="() => {
               showMobileNav = false
               logout()
             }"
-          />
+          >
+            <div class="w-full text-left">Logout</div>
+          </Button>
         </div>
       </nav>
     </template>
