@@ -253,7 +253,7 @@
             />
             <Button 
               type="button"
-              link
+              text
               label="Cancel"
               class="block"
               @click="() => isVisible = false"

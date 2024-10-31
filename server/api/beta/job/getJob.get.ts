@@ -53,13 +53,15 @@ export default defineEventHandler(async (e) => {
     isFuture = userInfo.remindFuture
   } else if (result.dismissRemind) {
     isRemind = false
+  } else if (result.updates.length === 0) {
+    isRemind = !result.dismissRemind
   } else if (checkRemind(
     result.updates[0].updateType,
     result.updates[0].updateTime,
     userInfo.remindDays,
     userInfo.remindOfferDays
   ) && !hasAcceptOffer) {
-    isRemind = true
+    isRemind = !result.dismissRemind
   }
 
   return {

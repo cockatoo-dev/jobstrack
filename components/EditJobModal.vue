@@ -1,32 +1,31 @@
 <script setup lang="ts">
   import { FetchError } from 'ofetch'
-
+  
   const isVisible = defineModel<boolean>()
   const props = defineProps<{
-    beta: boolean
+    beta?: boolean
+    jobId: string | string[]
+    currentCompanyName: string
+    currentJobTitle: string
+    currentJobDescription: string
     refreshData: () => Promise<void>
   }>()
 
   const companyName = ref("")
   const jobTitle = ref("")
   const jobDescription = ref("")
-  const hasApplied = ref(false)
-  const applicationNotes = ref("")
   const formLoading = ref(false)
   const errorMessage = ref("")
 
   watch(isVisible, () => {
-    if (!isVisible.value) {
-      companyName.value = ""
-      jobTitle.value = ""
-      jobDescription.value = ""
-      hasApplied.value = false
-      errorMessage.value = ""
+    if (isVisible.value) {
+      companyName.value = props.currentCompanyName
+      jobTitle.value = props.currentJobTitle
+      jobDescription.value = props.currentJobDescription
     }
   })
-  
+
   const submitForm = async () => {
-    formLoading.value = true
     if (companyName.value.length > 100) {
       errorMessage.value = "Company name is too long (maximum 100 characters)."
       formLoading.value = false
@@ -39,25 +38,18 @@
       errorMessage.value = "Job description is too long (maximum 10000 characters)."
       formLoading.value = false
       return
-    } else if (applicationNotes.value.length > 1000) {
-      errorMessage.value = "Application notes is too long (maximumn 1000 characters)."
-      formLoading.value = false
-      return
     }
 
     errorMessage.value = ""
     try {
       if (props.beta) {
-        await $fetch("/api/beta/job/addJob", {
+        await $fetch("/api/beta/job/editJob", {
         method: "post",
         body: {
+          jobId: props.jobId,
           companyName: companyName.value,
           jobTitle: jobTitle.value,
           jobDescription: jobDescription.value,
-          hasApplied: hasApplied.value,
-          timestamp: Date.now(),
-          dayTimestamp: dayTimestamp(),
-          applicationNotes: applicationNotes.value
         }
       })
       }
@@ -84,7 +76,6 @@
       }
     }
   }
-
 </script>
 
 <template>
@@ -96,7 +87,7 @@
   >
     <template #container>
       <div class="p-2 sm:p-8 overflow-auto">
-        <h2 class="text-slate-800 dark:text-slate-200 text-3xl font-bold">Add a new job.</h2>
+        <h2 class="text-slate-800 dark:text-slate-200 text-3xl font-bold">Edit this job.</h2>
         <form @submit.prevent="submitForm">
           <div class="pb-2 text-sm text-slate-800 dark:text-slate-200">
             Fields marked with a * are required.
@@ -144,9 +135,6 @@
               class="block pb-1 text-slate-800 dark:text-slate-200"
             >
               <div>Job Description</div>
-              <div class="text-sm">
-                It's a good idea to copy and paste the full job description from the job ad, so that you can refer back to it here in the future if the original job ad is removed.
-              </div>
             </label>
             <Textarea
               id="add-jobDescription"
@@ -159,55 +147,16 @@
             <CharLimit :str="jobDescription" :limit="10000" :show-length="8000" />
           </div>
 
-          <div class="pb-4 flex gap-2">
-            <div>
-              <Checkbox 
-                v-model="hasApplied"
-                input-id="add-hasApplied"
-                binary
-              />
-            </div>
-            <div>
-              <label
-                for="add-hasApplied"
-                class="text-slate-800 dark:text-slate-200"
-              >
-                Job Application Sent
-              </label>
-            </div>
-          </div>
-
-          <div v-if="hasApplied" class="pb-2">
-            <label 
-              for="add-applicationNotes"
-              class="block pb-1 text-slate-800 dark:text-slate-200"
-            >
-              <div>Application Notes</div>
-              <div class="text-sm">
-                Any notes you may want to keep about the job application.
-              </div>
-            </label>
-            <Textarea
-              id="add-applicationNotes"
-              v-model="applicationNotes"
-              :invalid="companyName.length > 1000"
-              class="block"
-              fluid
-              rows="5"
-            />
-            <CharLimit :str="applicationNotes" :limit="1000" :show-length="800" />
-          </div>
-
           <div class="py-2 flex gap-2">
             <Button 
               type="submit"
-              label="Add Job"
+              label="Edit Job"
               class="block"
               :loading="formLoading"
             />
             <Button 
               type="button"
-              text
+              link
               label="Cancel"
               class="block"
               @click="() => isVisible = false"

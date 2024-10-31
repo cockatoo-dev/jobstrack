@@ -1,8 +1,9 @@
 import { z } from "zod"
-import { addUpdate, checkJobOwner, deleteUpdate, getJobUpdates } from "~/server/db/db"
+import { addUpdate, checkJobOwner, deleteUpdate, getJobUpdates, setJobReminder } from "~/server/db/db"
 
 const bodySchema = z.object({
   jobId: z.string(),
+  hasDismissRemind: z.boolean(),
   updateType: z.string(),
   isFuture: z.boolean(),
   updateTime: z.number(),
@@ -144,6 +145,7 @@ export default defineEventHandler(async (e) => {
         checkedDay,
         bodyData.data.updateNotes
       )
+      
     } else {
       throw createError({
         status: 400,
@@ -159,6 +161,9 @@ export default defineEventHandler(async (e) => {
         checkedDay,
         bodyData.data.updateNotes
       )
+      if (bodyData.data.hasDismissRemind) {
+        await setJobReminder(bodyData.data.jobId, userId, false)
+      }
     } else {
       throw createError({
         status: 400,

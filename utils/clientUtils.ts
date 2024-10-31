@@ -24,8 +24,6 @@ export const updateTypes = {
 }
 
 export const checkTime = (serverTimestamp: number | undefined) => {
-  const DAY = 86400000
-
   if (!serverTimestamp) {
     return true
   } else if (Date.now() - serverTimestamp > DAY) {
@@ -182,7 +180,7 @@ export type clientUserSettings = {
   remindOfferDays: number
 }
 
-export type jobEditData = {
+export type editJobData = {
   jobId: string,
   companyName: string,
   jobTitle: string,
