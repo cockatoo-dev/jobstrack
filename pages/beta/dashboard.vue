@@ -107,13 +107,13 @@
       </template>
     </Dialog>
 
-    <main class="w-full px-1 sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] pt-4 mx-auto text-slate-800 dark:text-slate-200">
+    <main class="w-full px-1 pb-16 sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] pt-4 mx-auto text-slate-800 dark:text-slate-200">
       <div v-if="data">
         <h1 v-if="data.acceptJobs.length > 0" class="text-2xl sm:text-4xl pb-1">
           Congratulations!
         </h1>
         <h1 v-else class="text-2xl sm:text-4xl pb-1">
-          Welcome back, {{ data.username }}
+          Welcome back, {{ data.username }}.
         </h1>
 
         <Tabs v-model:value="selectedView">

@@ -132,7 +132,7 @@
       </template>
     </Dialog>
 
-    <main class="w-full sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] p-2 sm:p-0 mx-auto">
+    <main class="w-full sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] px-2 pt-2 pb-16 sm:px-0 mx-auto">
       <Button text as="router-link" to="/beta/dashboard" label="Back to Dashboard" />
       <div v-if="data" class="pt-2">
         <div v-if="data.isFuture && data.futureCount > 1" class="pb-2">
