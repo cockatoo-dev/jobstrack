@@ -50,9 +50,10 @@ export type updateItem = {
 export const TOKEN_COOKIE = "JobsTrackAuth"
 export const TOKEN_EXPIRY = 604700
 
-const jwtSecret = new TextEncoder().encode(process.env.JOBSTRACK_JWT)
+
 
 export const createBetaToken = async (uname: string) => {
+  const jwtSecret = new TextEncoder().encode(process.env.JOBSTRACK_JWT)
   return await new jose.SignJWT({jobsTrackUname: uname})
   .setProtectedHeader({alg: "HS256"})
   .setIssuedAt()
@@ -67,7 +68,7 @@ export const checkBetaToken = async (db: db, token: string | undefined) => {
       message: "No token provided. Please log in again."
     })
   }
-  
+  const jwtSecret = new TextEncoder().encode(process.env.JOBSTRACK_JWT)
   try {
     const { payload } = await jose.jwtVerify(token, jwtSecret, {algorithms: ["HS256"]})
     const authData = await db.getUserIdBeta(payload.jobsTrackUname as string)
@@ -105,7 +106,7 @@ export const checkBetaTokenUname = async (db: db, token: string | undefined) => 
       message: "No token provided. Please log in again."
     })
   }
-  
+  const jwtSecret = new TextEncoder().encode(process.env.JOBSTRACK_JWT)
   try {
     const { payload } = await jose.jwtVerify(token, jwtSecret, {algorithms: ["HS256"]})
     const authData = await db.getUserIdBeta(payload.jobsTrackUname as string)
