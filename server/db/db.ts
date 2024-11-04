@@ -1,11 +1,15 @@
-import { drizzle } from 'drizzle-orm/better-sqlite3'
-import Database from 'better-sqlite3'
+import { drizzle } from 'drizzle-orm/d1'
 import * as schema from './schema'
 import { jobs, updates, usersBeta, usersInfo } from './schema'
 import { and, desc, eq } from 'drizzle-orm'
 
-const sqlite = new Database(process.cwd() + '/localDB.db')
-const db = drizzle(sqlite, {schema})
+if (!process.env.CF_DB) {
+  throw createError({
+    statusCode: 500,
+    message: "Unable to connect to database."
+  })
+}
+const db = drizzle(process.env.CF_DB as never, {schema})
 
 export const createUserBeta = async (
   username: string, passwordHash: string
