@@ -1,11 +1,12 @@
-import { getDashboardJobs, getUserInfo } from "../../db/db"
+import { useDB } from "../../db/db"
 import { DAY } from "#imports"
 
 export default defineEventHandler(async (e) => {
-  const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
-  const userInfo = await getUserInfo(userId)
+  const db = useDB(e)
+  const userId = await checkBetaToken(db, getCookie(e, TOKEN_COOKIE))
+  const userInfo = await db.getUserInfo(userId)
 
-  const dbJobs = await getDashboardJobs(userId)
+  const dbJobs = await db.getDashboardJobs(userId)
 
   const allJobs: dashboardJobItem[] = []
   const futureJobs: dashboardJobItem[] = []

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { createUserBeta } from '../../../db/db'
+import { useDB } from '../../../db/db'
 import { createBetaToken, hashPassword, TOKEN_COOKIE, TOKEN_EXPIRY } from '../../../utils/serverUtils'
 
 const bodySchema = z.object({
@@ -36,8 +36,10 @@ export default defineEventHandler(async (e) => {
     })
   }
 
+  const db = useDB(e)
+
   const passHash = await hashPassword(bodyData.data.pass)
-  if (!(await createUserBeta(bodyData.data.uname, passHash))) {
+  if (!(await db.createUserBeta(bodyData.data.uname, passHash))) {
     throw createError({
       status: 400,
       message: "Username unavailable. Please try a differnt username."

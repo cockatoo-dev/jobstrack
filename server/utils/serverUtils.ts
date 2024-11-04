@@ -1,6 +1,6 @@
 import * as jose from 'jose'
 import { JOSEError } from 'jose/errors'
-import { getUserIdBeta } from '../db/db'
+import type { db } from '../db/db'
 import { sha256base64 } from 'ohash'
 
 export const DAY = 86400000
@@ -60,7 +60,7 @@ export const createBetaToken = async (uname: string) => {
   .sign(jwtSecret)
 }
 
-export const checkBetaToken = async (token: string | undefined) => {
+export const checkBetaToken = async (db: db, token: string | undefined) => {
   if (!token) {
     throw createError({
       status: 403,
@@ -70,7 +70,7 @@ export const checkBetaToken = async (token: string | undefined) => {
   
   try {
     const { payload } = await jose.jwtVerify(token, jwtSecret, {algorithms: ["HS256"]})
-    const authData = await getUserIdBeta(payload.jobsTrackUname as string)
+    const authData = await db.getUserIdBeta(payload.jobsTrackUname as string)
     if (authData.exists) {
       if ((payload.iat || 0) >= authData.passwordUpdateTime) {
         return authData.userId
@@ -98,7 +98,7 @@ export const checkBetaToken = async (token: string | undefined) => {
   }
 }
 
-export const checkBetaTokenUname = async (token: string | undefined) => {
+export const checkBetaTokenUname = async (db: db, token: string | undefined) => {
   if (!token) {
     throw createError({
       status: 403,
@@ -108,7 +108,7 @@ export const checkBetaTokenUname = async (token: string | undefined) => {
   
   try {
     const { payload } = await jose.jwtVerify(token, jwtSecret, {algorithms: ["HS256"]})
-    const authData = await getUserIdBeta(payload.jobsTrackUname as string)
+    const authData = await db.getUserIdBeta(payload.jobsTrackUname as string)
     if (authData.exists) {
       if ((payload.iat || 0) >= authData.passwordUpdateTime) {
         return payload.jobsTrackUname as string

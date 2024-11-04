@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { addUpdate, createJob, getUserJobs } from "~/server/db/db"
+import { useDB } from "~/server/db/db"
 
 const bodySchema = z.object({
   companyName: z.string(),
@@ -41,9 +41,10 @@ export default defineEventHandler(async (e) => {
     })
   }
   
-  const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
+  const db = useDB(e)
+  const userId = await checkBetaToken(db, getCookie(e, TOKEN_COOKIE))
 
-  const userJobs = await getUserJobs(userId)
+  const userJobs = await db.getUserJobs(userId)
   if (userJobs.length > limits.JOB_LIMIT) {
     throw createError({
       status: 400,
@@ -56,13 +57,13 @@ export default defineEventHandler(async (e) => {
   let jobId = ""
   
   if (bodyData.data.hasApplied) {
-    jobId = await createJob(
+    jobId = await db.createJob(
       userId,
       bodyData.data.companyName,
       bodyData.data.jobTitle,
       bodyData.data.jobDescription,
     )
-    await addUpdate(
+    await db.addUpdate(
       jobId,
       updateTypes.APPLICATION_SENT,
       checkedTime,
@@ -70,7 +71,7 @@ export default defineEventHandler(async (e) => {
       bodyData.data.applicationNotes
     )
   } else {
-    jobId = await createJob(
+    jobId = await db.createJob(
       userId,
       bodyData.data.companyName,
       bodyData.data.jobTitle,

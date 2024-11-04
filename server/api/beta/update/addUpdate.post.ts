@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { addUpdate, checkJobOwner, deleteUpdate, getJobUpdates, setJobReminder } from "~/server/db/db"
+import { useDB } from "~/server/db/db"
 
 const bodySchema = z.object({
   jobId: z.string(),
@@ -93,7 +93,8 @@ export default defineEventHandler(async (e) => {
     })
   }
 
-  const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
+  const db = useDB(e)
+  const userId = await checkBetaToken(db, getCookie(e, TOKEN_COOKIE))
 
   let checkedTime = -1
   let checkedDay = -1
@@ -114,14 +115,14 @@ export default defineEventHandler(async (e) => {
     checkedDay = getCheckedDay(bodyData.data.updateDay)
   }
 
-  if (!await checkJobOwner(bodyData.data.jobId, userId)) {
+  if (!await db.checkJobOwner(bodyData.data.jobId, userId)) {
     throw createError({
       status: 400,
       message: "Unknown job ID"
     })
   }
 
-  const updatesData = await getJobUpdates(bodyData.data.jobId)
+  const updatesData = await db.getJobUpdates(bodyData.data.jobId)
 
   for (const update of updatesData) {
     if (update.updateType === updateTypes.ACCEPT_OFFER) {
@@ -133,12 +134,12 @@ export default defineEventHandler(async (e) => {
   }
   
   if (updatesData.length >= limits.UPDATE_LIMIT) {
-    await deleteUpdate(bodyData.data.jobId, updatesData[9].updateId)
+    await db.deleteUpdate(bodyData.data.jobId, updatesData[9].updateId)
   }
 
   if (updatesData.length >= 1) {
     if (isValidUpdate(updatesData[0].updateType, bodyData.data.updateType)) {
-      await addUpdate(
+      await db.addUpdate(
         bodyData.data.jobId, 
         bodyData.data.updateType, 
         checkedTime,
@@ -154,7 +155,7 @@ export default defineEventHandler(async (e) => {
     }
   } else {
     if (isValidUpdate(updateTypes.NO_APPLICATION, bodyData.data.updateType)) {
-      await addUpdate(
+      await db.addUpdate(
         bodyData.data.jobId, 
         bodyData.data.updateType, 
         checkedTime,
@@ -162,7 +163,7 @@ export default defineEventHandler(async (e) => {
         bodyData.data.updateNotes
       )
       if (bodyData.data.hasDismissRemind) {
-        await setJobReminder(bodyData.data.jobId, userId, false)
+        await db.setJobReminder(bodyData.data.jobId, userId, false)
       }
     } else {
       throw createError({
