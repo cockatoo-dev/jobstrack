@@ -43,12 +43,8 @@
   >
     <template #container>
       <div class="p-4 text-slate-800 dark:text-slate-200">
-        <h3 class=" text-xl font-bold">
-          Delete Update?
-        </h3>
-        <p>
-          You are about to delete this update. This cannot be undone.
-        </p>
+        <h3 class=" text-xl font-bold">Delete Update?</h3>
+        <p>You are about to delete this update. This cannot be undone.</p>
         <div class="pt-2 flex gap-2">
           <Button 
             type="button"

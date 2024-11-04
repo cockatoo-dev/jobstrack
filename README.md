@@ -1,75 +1,14 @@
-# Nuxt 3 Minimal Starter
+# JobsTrack
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+A site to help you track your job applications.
 
-## Setup
+**Beta release cominb soon.**
 
-Make sure to install the dependencies:
+Got a suggestion? Head over to the [issues page.](https://github.com/max8539/jobstrack/issues)
 
-```bash
-# npm
-npm install
 
-# pnpm
-pnpm install
+## Roadmap to full release
 
-# yarn
-yarn install
+- Overhaul of the user account system to use sign in with Github. Sign in with other external providers may be added later.
+- Overhaul of the homepage.
 
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.

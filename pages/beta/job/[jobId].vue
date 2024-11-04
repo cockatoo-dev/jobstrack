@@ -362,5 +362,7 @@
       <DataLoadingError v-else-if="error" />
       <DataLoading v-else />
     </main>
+
+    <GithubLinks />
   </div>
 </template>

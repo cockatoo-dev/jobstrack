@@ -1,5 +1,4 @@
-# Databases
-.drizzle
+# Local Databases
 *.db
 
 # Nuxt dev/build outputs
