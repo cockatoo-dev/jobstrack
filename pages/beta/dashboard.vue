@@ -85,11 +85,11 @@
       class="w-11/12 sm:w-[37rem]"
     >
       <template #container>
-        <div class="p-4">
-          <div class="text-slate-800 dark:text-slate-200 text-xl font-bold">
+        <div class="p-4 text-slate-800 dark:text-slate-200">
+          <div class=" text-xl font-bold">
             Job limit reached.
           </div>
-          <div class="text-slate-800 dark:text-slate-200">
+          <div class="">
             You've reached the maximum number of jobs for your account.
             Consider deleting a job which you are no longer considering, then return here to add a new job.
           </div>
@@ -98,6 +98,7 @@
               type="button"
               text
               label="Cancel"
+              autofocus
               class="block"
               @click="() => {showJobLimit = false}"
             />
@@ -106,12 +107,14 @@
       </template>
     </Dialog>
 
-    <div class="w-full px-1 sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] pt-4 mx-auto">
+    <main class="w-full px-1 sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] pt-4 mx-auto text-slate-800 dark:text-slate-200">
       <div v-if="data">
-        <div class="text-lg sm:text-2xl lg:text-4xl pb-1 text-slate-800 dark:text-slate-200">
-          <span v-if="data.acceptJobs.length > 0">Congratulations!</span>
-          <span v-else>Welcome back, {{ data.username }}.</span>
-        </div>
+        <h1 v-if="data.acceptJobs.length > 0" class="text-2xl sm:text-4xl pb-1">
+          Congratulations!
+        </h1>
+        <h1 v-else class="text-2xl sm:text-4xl pb-1">
+          Welcome back, {{ data.username }}
+        </h1>
 
         <Tabs v-model:value="selectedView">
           <TabList>
@@ -157,7 +160,7 @@
 
               <div
                 v-if="data.futureJobs.length === 0 && data.remindJobs.length === 0"
-                class="py-4 text-center text-2xl font-bold text-slate-800 dark:text-slate-200"
+                class="py-4 text-center text-2xl font-bold "
               >
                 No reminders.
               </div>
@@ -275,7 +278,7 @@
               </Accordion>
               <div
                 v-if="data.allJobs.length === 0"
-                class="py-4 text-center text-2xl font-bold text-slate-800 dark:text-slate-200"
+                class="py-4 text-center text-2xl font-bold "
               >
                 No jobs.
               </div>
@@ -284,7 +287,7 @@
         </Tabs>
 
         <div class="grid grid-cols-[1fr_auto] pt-2">
-          <h3 class="text-2xl font-bold text-slate-800 dark:text-slate-200">All Jobs</h3>
+          <h3 class="text-2xl font-bold ">All Jobs</h3>
           <Button 
             class="block"
             label="Add Job"
@@ -306,10 +309,13 @@
             :refresh-data="refresh" 
           />
         </div>
-        <div v-else class="py-4 text-center text-2xl font-bold text-slate-800 dark:text-slate-200">
+        <div v-else class="py-4 text-center text-2xl font-bold ">
           Click 'Add Job' above to add your first job.
         </div>
       </div>
-    </div>
+
+      <DataLoadingError v-else-if="error" />
+      <DataLoading v-else />
+    </main>
   </div>
 </template>

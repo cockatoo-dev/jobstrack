@@ -7,10 +7,7 @@
   }>()
 
   const showMobileNav = ref(false)
-  
-  const alertFunction = () => {
-    alert(1)
-  }
+  const showUserSettings = ref(false)
   
   const logout = async () => {
     try {
@@ -30,6 +27,14 @@
 </script>
 
 <template>
+  <div>
+    <BetaUserSettingsModal 
+      v-if="beta"
+      v-model="showUserSettings"
+      :refresh-data
+    />
+  </div>
+  
   <nav class="grid grid-cols-[1fr_auto] sm:hidden w-full px-2 py-1">
     <NavLogo :beta />
     <div>
@@ -43,7 +48,7 @@
   >
     <template #container>
       <div class="px-2 pt-2 grid grid-cols-[1fr_auto]">
-        <div class="pt-2 pl-3 font-bold text-xl text-slate-800 dark:text-slate-200">Menu</div>
+        <h3 class="pt-2 pl-3 font-bold text-xl text-slate-800 dark:text-slate-200">Menu</h3>
         <div>
           <Button 
             text
@@ -57,10 +62,11 @@
           <Button 
             text 
             label="User Settings"
+            autofocus
             fluid
             @click="() => {
               showMobileNav = false
-              alertFunction()
+              showUserSettings = true
             }" 
           >
             <div class="w-full text-left">User Settings</div>
@@ -85,7 +91,7 @@
   <nav class="hidden sm:grid sm:grid-cols-[1fr_auto_auto] w-full sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] mx-auto px-2 py-1">
     <NavLogo :beta />
     <div class="pl-2">
-      <Button text label="User Settings" @click="alertFunction" />
+      <Button text label="User Settings" @click="() => {showUserSettings = true}" />
     </div>
     <div class="pl-2">
       <Button text label="Logout" @click="logout" />

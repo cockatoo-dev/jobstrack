@@ -98,6 +98,44 @@ export const checkBetaToken = async (token: string | undefined) => {
   }
 }
 
+export const checkBetaTokenUname = async (token: string | undefined) => {
+  if (!token) {
+    throw createError({
+      status: 403,
+      message: "No token provided. Please log in again."
+    })
+  }
+  
+  try {
+    const { payload } = await jose.jwtVerify(token, jwtSecret, {algorithms: ["HS256"]})
+    const authData = await getUserIdBeta(payload.jobsTrackUname as string)
+    if (authData.exists) {
+      if ((payload.iat || 0) >= authData.passwordUpdateTime) {
+        return payload.jobsTrackUname as string
+      } else {
+        throw createError({
+          status: 403,
+          message: "Expired token. Please log in again."
+        })
+      }
+    } else {
+      throw createError({
+        status: 403,
+        message: "Invalid token. Please log out and log in again."
+      })
+    }
+  } catch (e) {
+    if (e instanceof JOSEError) {
+      throw createError({
+        status: 401,
+        message: "Invalid token. Please log out and log in again."
+      })
+    } else {
+      throw e
+    }
+  }
+}
+
 export const hashPassword = async (password: string) => {
   return sha256base64(password)
 }

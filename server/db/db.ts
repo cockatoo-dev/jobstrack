@@ -48,12 +48,8 @@ export const checkLoginBeta = async (
 
 export const changePasswordBeta = async (
   username: string, 
-  oldPasswordHash: string, 
   newPasswordHash: string
 ) => {
-  if (!(await checkLoginBeta(username, oldPasswordHash))) {
-    return false
-  }
   await db.update(usersBeta).set({passwordHash: newPasswordHash})
   .where(eq(usersBeta.username, username))
 }
@@ -94,20 +90,13 @@ export const getUserInfo = async (userId: string) => {
   return data[0]
 }
 
-export const editUserPasswordBeta = async (
-  username: string, passwordHash: string
-) => {
-  await db.update(usersBeta).set({passwordHash})
-  .where(eq(usersBeta.username, username))
-}
-
 export const editUserSettings = async (
   userId: string,
-  remindFuture: boolean,
   remindDays: number, 
-  remindOfferDays: number
+  remindOfferDays: number,
+  remindFuture: boolean
 ) => {
-  await db.update(usersInfo).set({remindFuture, remindDays, remindOfferDays})
+  await db.update(usersInfo).set({remindDays, remindOfferDays, remindFuture})
   .where(eq(usersInfo.userId, userId))
 }
 

@@ -37,14 +37,10 @@
     modal
     class="w-11/12 sm:w-[37rem]"
   >
-  <template #container>
-      <div class="p-4">
-        <div class="text-slate-800 dark:text-slate-200 text-xl font-bold">
-          Delete Job?
-        </div>
-        <div class="text-slate-800 dark:text-slate-200">
-          You are about to delete this job and all updates made to this job. This cannot be undone.
-        </div>
+    <template #container>
+      <div class="p-4 text-slate-800 dark:text-slate-200">
+        <h3 class="text-xl font-bold">Delete Job?</h3>
+        <p>You are about to delete this job and all updates made to this job. This cannot be undone.</p>
         <div class="pt-2 flex gap-2">
           <Button 
             type="button"
@@ -58,6 +54,7 @@
             type="button"
             text
             label="Cancel"
+            autofocus
             class="block"
             @click="() => {isVisible = false}"
           />

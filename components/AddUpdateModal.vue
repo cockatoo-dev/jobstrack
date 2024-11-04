@@ -159,32 +159,34 @@
     header="Add Job"
   >
     <template #container>
-      <div class="p-4 sm:p-8 overflow-auto">
-        <h2 class="text-slate-800 dark:text-slate-200 text-3xl font-bold">Add an update.</h2>
+      <div class="p-4 sm:p-8 overflow-auto text-slate-800 dark:text-slate-200">
+        <h2 class="text-3xl font-bold">Add an update.</h2>
         <form @submit.prevent="submitForm">
-          <div class="pb-2 text-sm text-slate-800 dark:text-slate-200">
+          <p class="pb-2 text-sm ">
             Fields marked with a * are required.
-          </div>
+          </p>
           
           <div class="pb-4">
             <label 
               for="update-updateType"
-              class="block pb-1 text-slate-800 dark:text-slate-200"
+              class="block pb-1 "
             >
               Update Type*
             </label>
             <Select 
               v-model="updateType"
               input-id="update-updateType"
+              aria-label="Update Type*"
               :options="updateSelection"
               required
+              autofocus
               class="block"
               fluid
             />
           </div>
 
           <div class="pb-4">
-            <div class="block pb-1 text-slate-800 dark:text-slate-200">Update Time</div>
+            <div class="block pb-1 ">Update Time</div>
             <div class="flex gap-2">
               <RadioButton 
                 v-model="updateTimeOption" 
@@ -194,7 +196,7 @@
               />
               <label 
                 for="update-updateTime-today" 
-                class="text-slate-800 dark:text-slate-200"
+                class=""
               >
                 Today
               </label>
@@ -207,7 +209,7 @@
               />
               <label
                 for="update-updateTime-future"
-                :class="disableFuture ? 'text-slate-500' : 'text-slate-800 dark:text-slate-200'"
+                :class="disableFuture ? 'text-slate-500' : ''"
               >
                 In the future
               </label>
@@ -230,7 +232,7 @@
           <div class="pb-4">
             <label 
               for="update-updateNotes"
-              class="block pb-1 text-slate-800 dark:text-slate-200"
+              class="block pb-1 "
             >
               <div>Update Notes</div>
               <div class="text-sm">

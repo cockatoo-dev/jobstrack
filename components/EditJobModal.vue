@@ -86,17 +86,17 @@
     header="Add Job"
   >
     <template #container>
-      <div class="p-2 sm:p-8 overflow-auto">
-        <h2 class="text-slate-800 dark:text-slate-200 text-3xl font-bold">Edit this job.</h2>
+      <div class="p-2 sm:p-8 overflow-auto text-slate-800 dark:text-slate-200">
+        <h2 class=" text-3xl font-bold">Edit this job.</h2>
         <form @submit.prevent="submitForm">
-          <div class="pb-2 text-sm text-slate-800 dark:text-slate-200">
+          <div class="pb-2 text-sm ">
             Fields marked with a * are required.
           </div>
 
           <div class="pb-2">
             <label 
               for="edit-companyName"
-              class="block pb-1 text-slate-800 dark:text-slate-200"
+              class="block pb-1 "
             >
               Company Name*
             </label>
@@ -105,6 +105,7 @@
               v-model="companyName"
               required
               :invalid="companyName.length > 100"
+              autofocus
               class="block"
               fluid
             />
@@ -114,7 +115,7 @@
           <div class="pb-2">
             <label 
               for="edit-jobTitle"
-              class="block pb-1 text-slate-800 dark:text-slate-200"
+              class="block pb-1 "
             >
               Job Title*
             </label>
@@ -132,7 +133,7 @@
           <div class="pb-2">
             <label 
               for="edit-jobDescription"
-              class="block pb-1 text-slate-800 dark:text-slate-200"
+              class="block pb-1 "
             >
               <div>Job Description</div>
             </label>
@@ -150,7 +151,7 @@
           <div class="py-2 flex gap-2">
             <Button 
               type="submit"
-              label="Edit Job"
+              label="Save Changes"
               class="block"
               :loading="formLoading"
             />

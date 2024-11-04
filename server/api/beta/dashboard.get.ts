@@ -42,6 +42,8 @@ export default defineEventHandler(async (e) => {
       }
       if (futureCount > 0 && !hasAcceptOffer) {
         isFuture = userInfo.remindFuture
+      } else if (job.dismissRemind || hasAcceptOffer) {
+        isRemind = false
       } else if (
         updateType === updateTypes.ACCEPT_OFFER ||
         updateType === updateTypes.DECLINE_OFFER ||
@@ -50,7 +52,7 @@ export default defineEventHandler(async (e) => {
       ) {
         isRemind = false
       } else if (updateType === updateTypes.RECEIVE_OFFER && !hasAcceptOffer) {
-        isRemind = Date.now() - updateTime > DAY * userInfo.remindOfferDays
+        isRemind = Date.now() - updateTime > DAY * userInfo.remindOfferDays 
       } else if (!hasAcceptOffer) {
         isRemind = Date.now() - updateTime > DAY * userInfo.remindDays
       }
@@ -103,7 +105,7 @@ export default defineEventHandler(async (e) => {
 
   return {
     timestamp: Date.now(),
-    ...userInfo,
+    username: userInfo.username,
     allJobs,
     futureJobs,
     remindJobs,

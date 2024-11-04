@@ -31,7 +31,7 @@
 
 <template>
   <div class="w-full mx-auto">
-    <div v-if="search" class="w-full pt-2">
+    <div v-if="search" class="w-full py-2">
       <label for="dashboard-search" class="hidden">Search for a job</label>
       <InputText 
         id="dashboard-search"

@@ -101,18 +101,19 @@
       class="w-11/12 sm:w-[37rem]"
     >
       <template #container>
-        <div class="p-4">
-          <div class="text-slate-800 dark:text-slate-200 text-xl font-bold">
+        <div class="p-4 text-slate-800 dark:text-slate-200">
+          <h3 class=" text-xl font-bold">
             Update limit reached.
-          </div>
-          <div class="text-slate-800 dark:text-slate-200">
+          </h3>
+          <p class="">
             You've reached the maximum number of updates for this job. 
             When you create a new update for this job, the oldest update for this job will be deleted.
-          </div>
+          </p>
           <div class="pt-2 flex gap-2">
             <Button 
               type="button"
               label="Proceed"
+              autofocus
               class="block"
               @click="() => {
                 showUpdateLimit = false
@@ -131,23 +132,21 @@
       </template>
     </Dialog>
 
-    <div 
-      class="w-full sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] p-2 sm:p-0 mx-auto"
-    >
+    <main class="w-full sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] p-2 sm:p-0 mx-auto">
       <Button text as="router-link" to="/beta/dashboard" label="Back to Dashboard" />
       <div v-if="data" class="pt-2">
         <div v-if="data.isFuture && data.futureCount > 1" class="pb-2">
-          <div class="px-2 py-1 rounded-lg border-1 border-yellow-500 bg-yellow-200 dark:bg-yellow-800 text-slate-800 dark:text-slate-200">
+          <p class="px-2 py-1 rounded-lg border-1 border-yellow-500 bg-yellow-200 dark:bg-yellow-800 ">
             You have {{ data.futureCount }} upcoming events. Good luck!
-          </div>
+          </p>
         </div>
         <div v-else-if="data.isFuture && data.updates.length > 0" class="pb-2">
-          <div class="px-2 py-1 rounded-lg border-2 border-yellow-500 bg-yellow-200 dark:bg-yellow-800 text-slate-800 dark:text-slate-200">
+          <p class="px-2 py-1 rounded-lg border-2 border-yellow-500 bg-yellow-200 dark:bg-yellow-800 ">
             You have an upcoming {{ data.updates[0].updateType }} {{ timeToDaysString(data.updates[0].updateTime, checkedTime) }}. Good luck!
-          </div>
+          </p>
         </div>
         <div v-else-if="data.isRemind" class="pb-2">
-          <div class="px-2 py-1 rounded-lg border-2 border-fuchsia-500 bg-fuchsia-200 dark:bg-fuchsia-800 text-slate-800 dark:text-slate-200">
+          <p class="px-2 py-1 rounded-lg border-2 border-fuchsia-500 bg-fuchsia-200 dark:bg-fuchsia-800 ">
             <span v-if="lastUpdateType === updateTypes.NO_APPLICATION">
               You haven't applied to this job yet. It's a good idea to send your application as soon as possible, then add an update here when you're done.
             </span>
@@ -157,7 +156,7 @@
             <span v-else>
               You haven't updated this job in a while. Consider following up with the company, or add an update here if something has happened more recently.
             </span>
-          </div>
+          </p>
         </div>
         <div
           class="px-4 py-3 rounded-2xl border-4"
@@ -166,17 +165,17 @@
             lastUpdateType === updateTypes.RECEIVE_OFFER ? 'border-fuchsia-500' : 'border-slate-500'
           )"
         >
-          <h2 class="text-4xl pb-2 font-bold text-slate-800 dark:text-slate-200">
+          <h1 class="text-4xl pb-2 font-bold ">
             {{ data.companyName }}
-          </h2>
-          <div class="text-xl font-bold text-slate-800 dark:text-slate-200">
+          </h1>
+          <p class="text-xl font-bold ">
             {{ data.jobTitle }}
-          </div>
+          </p>
           <MultiLine
             v-if="data.jobDescription !== ''"
             :text="data.jobDescription"
             class="pt-4"
-            line-class="text-slate-800 dark:text-slate-200"
+            line-class=""
           />
         </div>
 
@@ -233,7 +232,7 @@
         >
           <template #container>
             <div class="px-2 pt-2 grid grid-cols-[1fr_auto]">
-              <div class="pt-2 pl-3 font-bold text-xl text-slate-800 dark:text-slate-200">Job Options</div>
+              <h3 class="pt-2 pl-3 font-bold text-xl ">Job Options</h3>
               <div>
                 <Button 
                   text
@@ -248,6 +247,7 @@
                   v-if="data && data.dismissRemind"
                   type="button"
                   label="Turn On Reminders"
+                  autofocus
                   fluid
                   :loading="remindLoading"
                   @click="() => {setDismissRemind(false).then(() => showMobileOptions = false)}"
@@ -259,6 +259,7 @@
                   type="button"
                   text
                   label="Turn Off Reminders"
+                  autofocus
                   fluid
                   :loadkg="remindLoading"
                   @click="() => {setDismissRemind(true).then(() => showMobileOptions = false)}"
@@ -296,24 +297,23 @@
             </nav>
           </template>
         </Dialog>
-
         <div 
           v-if="lastUpdateType === updateTypes.ACCEPT_OFFER"
           class="pt-2"
         >
-          <h3 class="pt-2 pb-1 text-2xl drop-shadow-2xl font-bold text-slate-800 dark:text-slate-200">
+          <h2 class="pt-2 pb-1 text-2xl drop-shadow-2xl font-bold ">
             Updates
-          </h3>
+          </h2>
         </div>
         <div v-else class="grid grid-cols-[1fr_auto] pt-2">
-          <h3 class="pt-2 pb-1 text-2xl drop-shadow-2xl font-bold text-slate-800 dark:text-slate-200">
+          <h2 class="pt-2 pb-1 text-2xl drop-shadow-2xl font-bold ">
             Updates
-          </h3>
+          </h2>
           <Button 
             label="Add Update"
             class="block font-bold"
             @click="() => {
-              if (data && data.updates.length > limits.UPDATE_LIMIT) {
+              if (data && data.updates.length >= limits.UPDATE_LIMIT) {
                 showUpdateLimit = true
               } else {
                 showAddUpdate = true
@@ -323,16 +323,16 @@
         </div>
         
         <div v-if="lastUpdateType === updateTypes.NO_APPLICATION">
-          <div class="pt-2 text-lg font-bold text-slate-800 dark:text-slate-200">
+          <p class="pt-2 text-lg font-bold ">
             You haven't applied to this job yet.
-          </div>
+          </p>
         </div>
         <div v-else class="pt-2">
           <div v-for="update of data.updates" :key="update.updateId" class="pb-2">
             <div class="grid grid-cols-[1fr_auto] pt-1 border-t-2 border-slate-200 dark:border-slate-800">
-              <h4 class="py-2 text-lg font-bold text-slate-800 dark:text-slate-200">
+              <h3 class="py-2 text-lg font-bold ">
                 {{ capitaliseFirst(update.updateType) }}
-              </h4>
+              </h3>
               <Button 
                 type="button"
                 text
@@ -346,18 +346,21 @@
               />
             </div>
             
-            <div class="pb-2 text-slate-800 dark:text-slate-200">
+            <p class="pb-2 ">
               {{ capitaliseFirst(timeToDaysString(update.updateTime, checkedTime)) }}
-            </div>
+            </p>
             <div v-if="update.updateNotes" class="pb-2">
               <MultiLine 
                 :text="update.updateNotes"
-                line-class="text-slate-800 dark:text-slate-200"
+                line-class=""
               />
             </div>
           </div>
         </div>
       </div>
-    </div>
+      
+      <DataLoadingError v-else-if="error" />
+      <DataLoading v-else />
+    </main>
   </div>
 </template>

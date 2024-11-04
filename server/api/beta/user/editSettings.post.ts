@@ -3,7 +3,8 @@ import { editUserSettings } from "~/server/db/db"
 
 const bodySchema = z.object({
   remindDays: z.number(),
-  remindOfferDays: z.number()
+  remindOfferDays: z.number(),
+  remindFuture: z.boolean()
 })
 
 export default defineEventHandler(async (e) => {
@@ -27,6 +28,7 @@ export default defineEventHandler(async (e) => {
   await editUserSettings(
     userId, 
     bodyData.data.remindDays, 
-    bodyData.data.remindOfferDays
+    bodyData.data.remindOfferDays,
+    bodyData.data.remindFuture
   )
 })
