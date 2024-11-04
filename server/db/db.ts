@@ -1,4 +1,4 @@
-import { drizzle, DrizzleD1Database } from 'drizzle-orm/d1'
+import { drizzle, type DrizzleD1Database } from 'drizzle-orm/d1'
 import * as schema from './schema'
 import { jobs, updates, usersBeta, usersInfo } from './schema'
 import { and, desc, eq } from 'drizzle-orm'
@@ -10,7 +10,7 @@ if (!process.env.CF_DB) {
     message: "Unable to connect to database."
   })
 }
-const db = drizzle(process.env.CF_DB as never, {schema})
+
 export class db {
   private _db: DrizzleD1Database<typeof schema>
 
