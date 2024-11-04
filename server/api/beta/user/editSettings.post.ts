@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { editUserSettings } from "~/server/db/db"
+import { useDB } from "~/server/db/db"
 
 const bodySchema = z.object({
   remindDays: z.number(),
@@ -24,8 +24,9 @@ export default defineEventHandler(async (e) => {
     })
   }
 
-  const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
-  await editUserSettings(
+  const db = useDB(e)
+  const userId = await checkBetaToken(db, getCookie(e, TOKEN_COOKIE))
+  await db.editUserSettings(
     userId, 
     bodyData.data.remindDays, 
     bodyData.data.remindOfferDays,

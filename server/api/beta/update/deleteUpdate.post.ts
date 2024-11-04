@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { checkJobOwner, deleteUpdate } from "~/server/db/db"
+import { useDB } from "~/server/db/db"
 
 const bodySchema = z.object({
   jobId: z.string(),
@@ -15,10 +15,11 @@ export default defineEventHandler(async (e) => {
     })
   }
 
-  const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
+  const db = useDB(e)
+  const userId = await checkBetaToken(db, getCookie(e, TOKEN_COOKIE))
 
-  if (await checkJobOwner(bodyData.data.jobId, userId)) {
-    const del = await deleteUpdate(bodyData.data.jobId, bodyData.data.updateId)
+  if (await db.checkJobOwner(bodyData.data.jobId, userId)) {
+    const del = await db.deleteUpdate(bodyData.data.jobId, bodyData.data.updateId)
     if (del.length < 1) {
       throw createError({
         status: 400,

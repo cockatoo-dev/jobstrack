@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { changePasswordBeta, checkLoginBeta } from "~/server/db/db"
+import { useDB } from "~/server/db/db"
 
 const bodySchema = z.object({
   oldPass: z.string(),
@@ -34,10 +34,12 @@ export default defineEventHandler(async (e) => {
     })
   }
 
+  const db = useDB(e)
+
   
-  const uname = await checkBetaTokenUname(getCookie(e, TOKEN_COOKIE))
+  const uname = await checkBetaTokenUname(db, getCookie(e, TOKEN_COOKIE))
   const oldPassHash = await hashPassword(bodyData.data.oldPass)
-  if (!(await checkLoginBeta(uname, oldPassHash))) {
+  if (!(await db.checkLoginBeta(uname, oldPassHash))) {
     throw createError({
       status: 400,
       message: "Old password is incorrect."
@@ -45,7 +47,7 @@ export default defineEventHandler(async (e) => {
   }
   
   const newPassHash = await hashPassword(bodyData.data.newPass)
-  await changePasswordBeta(uname, newPassHash)
+  await db.changePasswordBeta(uname, newPassHash)
   setCookie(e, TOKEN_COOKIE, await createBetaToken(uname), {
     httpOnly: true,
     maxAge: TOKEN_EXPIRY

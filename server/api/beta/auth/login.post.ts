@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { checkLoginBeta } from "../../../db/db"
+import { useDB } from "../../../db/db"
 import { createBetaToken, hashPassword, TOKEN_COOKIE, TOKEN_EXPIRY } from "../../../utils/serverUtils"
 
 const bodySchema = z.object({
@@ -16,10 +16,10 @@ export default defineEventHandler(async (e) => {
       message: "Invalid data types."
     })
   }
-
+  const db = useDB(e)
   const passHash = await hashPassword(bodyData.data.pass)
 
-  if (await checkLoginBeta(bodyData.data.uname, passHash)) {
+  if (await db.checkLoginBeta(bodyData.data.uname, passHash)) {
     setCookie(e, TOKEN_COOKIE, await createBetaToken(bodyData.data.uname), {
       httpOnly: true,
       maxAge: TOKEN_EXPIRY

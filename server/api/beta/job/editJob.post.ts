@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { checkJobOwner, editJob } from "~/server/db/db"
+import { useDB } from "~/server/db/db"
 
 const bodySchema = z.object({
   jobId: z.string(),
@@ -27,10 +27,11 @@ export default defineEventHandler(async (e) => {
     })
   }
 
-  const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
+  const db = useDB(e)
+  const userId = await checkBetaToken(db, getCookie(e, TOKEN_COOKIE))
 
-  if (await checkJobOwner(bodyData.data.jobId, userId)) {
-    await editJob(
+  if (await db.checkJobOwner(bodyData.data.jobId, userId)) {
+    await db.editJob(
       bodyData.data.jobId,
       userId,
       bodyData.data.companyName,

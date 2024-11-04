@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { getJobData, getUserInfo } from "~/server/db/db"
+import { useDB } from "~/server/db/db"
 
 const querySchema = z.object({
   jobId: z.string()
@@ -14,15 +14,16 @@ export default defineEventHandler(async (e) => {
     })
   }
 
-  const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
-  const userInfo = await getUserInfo(userId)
+  const db = useDB(e)
+  const userId = await checkBetaToken(db, getCookie(e, TOKEN_COOKIE))
+  const userInfo = await db.getUserInfo(userId)
 
   let isFuture = false
   let isRemind = false
   let futureCount = 0
   let hasAcceptOffer = false
 
-  const dbData = await getJobData(queryData.data.jobId, userId)
+  const dbData = await db.getJobData(queryData.data.jobId, userId)
   if (!dbData) {
     throw createError({
       status: 400,

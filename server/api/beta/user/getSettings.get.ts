@@ -1,6 +1,7 @@
-import { getUserInfo } from "~/server/db/db"
+import { useDB } from "~/server/db/db"
 
 export default defineEventHandler(async (e) => {
-  const userId = await checkBetaToken(getCookie(e, TOKEN_COOKIE))
-  return await getUserInfo(userId)
+  const db = useDB(e)
+  const userId = await checkBetaToken(db, getCookie(e, TOKEN_COOKIE))
+  return await db.getUserInfo(userId)
 })
