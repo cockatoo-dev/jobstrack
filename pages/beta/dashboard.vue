@@ -160,7 +160,7 @@
 
               <div
                 v-if="data.futureJobs.length === 0 && data.remindJobs.length === 0"
-                class="py-4 text-center text-2xl font-bold "
+                class="py-4 text-center text-2xl font-bold text-slate-800 dark:text-slate-200"
               >
                 No reminders.
               </div>
@@ -278,7 +278,7 @@
               </Accordion>
               <div
                 v-if="data.allJobs.length === 0"
-                class="py-4 text-center text-2xl font-bold "
+                class="py-4 text-center text-2xl font-bold text-slate-800 dark:text-slate-200"
               >
                 No jobs.
               </div>
