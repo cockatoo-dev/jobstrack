@@ -49,9 +49,13 @@ export default defineNuxtConfig({
     "/": {prerender: true},
     "/login": {redirect: "/beta/login", },
     "/dashboard": {redirect: "/beta/dashboard"},
+    // "/login": {ssr: false},
     // "/dashboard": {ssr: false},
     // "/job/*": {ssr: false},
+    "/beta/login": {ssr: false},
     "/beta/dashboard": {ssr: false},
-    "/beta/job/*": {ssr: false}
+    "/beta/job/*": {ssr: false},
+    "/account/changePassord": {ssr: false},
+    "/account/deleteAccount": {ssr: false}
   }
 })
