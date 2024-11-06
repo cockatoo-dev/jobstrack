@@ -97,7 +97,7 @@
             <Button 
               type="button"
               text
-              label="Cancel"
+              label="Close"
               autofocus
               class="block"
               @click="() => {showJobLimit = false}"
