@@ -1,5 +1,5 @@
 <template>
-  <footer class="w-11/12 sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] mx-auto text-slate-800 dark:text-slate-200 text-xs sm:text-base">
+  <footer class="w-11/12 pb-8 sm:w-[39rem] lg:w-[56rem] 2xl:w-[73rem] mx-auto text-slate-800 dark:text-slate-200 text-xs sm:text-base">
     <p>
       JobsTrack | Check out the project's 
       <NuxtLink 

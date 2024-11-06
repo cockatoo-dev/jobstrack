@@ -58,7 +58,7 @@
         </div>
       </div>
       <nav class="p-2 text-left">
-        <div>
+        <div class="pt-2">
           <Button 
             text 
             label="User Settings"
@@ -72,7 +72,7 @@
             <div class="w-full text-left">User Settings</div>
           </Button>
         </div>
-        <div>
+        <div class="pt-2">
           <Button 
             text 
             label="Logout" 
