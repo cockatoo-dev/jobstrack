@@ -21,6 +21,7 @@
       jobTitle.value = ""
       jobDescription.value = ""
       hasApplied.value = false
+      applicationNotes.value = ""
       errorMessage.value = ""
     }
   })
