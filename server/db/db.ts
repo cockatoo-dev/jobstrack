@@ -1,9 +1,9 @@
-import { drizzle, type BetterSQLite3Database } from 'drizzle-orm/better-sqlite3'
+import { drizzle, type DrizzleD1Database } from 'drizzle-orm/d1'
 import * as schema from './schema'
 import { jobs, updates, usersBeta, usersInfo } from './schema'
 import { and, desc, eq } from 'drizzle-orm'
 import type { EventHandlerRequest, H3Event } from "h3"
-import Database from 'better-sqlite3'
+// import Database from 'better-sqlite3'
 
 if (!process.env.CF_DB) {
   throw createError({
@@ -13,14 +13,13 @@ if (!process.env.CF_DB) {
 }
 
 export class db {
-  private _db: BetterSQLite3Database<typeof schema>
+  private _db: DrizzleD1Database<typeof schema>
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   constructor (e: H3Event) {
-    // const d1 = e.context.cloudflare.env.CF_DB as unknown as D1Database
-    // this._db = drizzle(d1, {schema})
-    const sqlite = new Database(process.cwd() + "/.localdb.db")
-    this._db = drizzle(sqlite, {schema})
+    const d1 = e.context.cloudflare.env.CF_DB as unknown as D1Database
+    this._db = drizzle(d1, {schema})
+    // const sqlite = new Database(process.cwd() + "/.localdb.db")
+    // this._db = drizzle(sqlite, {schema})
   }
 
   public createUserBeta = async (
