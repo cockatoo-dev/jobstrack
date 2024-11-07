@@ -1,11 +1,14 @@
 <script lang="ts" setup>
   const showAddJob = ref(false)
   const showJobLimit = ref(false)
+  const showLoadError = ref(false)
 
   const { data, error, refresh } = useFetch("/api/beta/dashboard")
   watch(error, async () => {
     if (error.value?.statusCode === 403) {
       await navigateTo("/beta/login")
+    } else if (error.value) {
+      showLoadError.value = true
     }
   })
 
@@ -97,7 +100,7 @@
             <Button 
               type="button"
               text
-              label="Cancel"
+              label="Close"
               autofocus
               class="block"
               @click="() => {showJobLimit = false}"
@@ -314,7 +317,7 @@
         </div>
       </div>
 
-      <DataLoadingError v-else-if="error" />
+      <DataLoadingError v-else-if="showLoadError" />
       <DataLoading v-else />
     </main>
 

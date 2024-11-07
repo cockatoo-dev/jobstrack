@@ -156,7 +156,7 @@
           </div>
           <FormError :message="errorMessage" />
         </form>
-        <DataLoadingError v-else-if="error" />
+        <DataLoadingError v-else-if="settingsLoadError" />
         <DataLoading v-else />
 
         <h3 class="pt-4  text-xl font-bold">User Account Settings</h3>
