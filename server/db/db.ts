@@ -5,13 +5,6 @@ import { and, desc, eq } from 'drizzle-orm'
 import type { EventHandlerRequest, H3Event } from "h3"
 import Database from 'better-sqlite3'
 
-if (!process.env.CF_DB) {
-  throw createError({
-    statusCode: 500,
-    message: "Unable to connect to database."
-  })
-}
-
 export class db {
   private _db: BetterSQLite3Database<typeof schema>
 
@@ -19,7 +12,7 @@ export class db {
   constructor (e: H3Event) {
     // const d1 = e.context.cloudflare.env.CF_DB as unknown as D1Database
     // this._db = drizzle(d1, {schema})
-    const sqlite = new Database(process.cwd() + "/.localdb.db")
+    const sqlite = new Database(process.cwd() + "/localDB.db")
     this._db = drizzle(sqlite, {schema})
   }
 
