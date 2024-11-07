@@ -31,7 +31,11 @@ export default defineEventHandler(async (e) => {
       isRemind = !job.dismissRemind
     } else {
       updateType = job.updates[0].updateType
-      updateTime = job.updates[0].updateDay
+      if (job.updates[0].updateTime > Date.now()) {
+        updateTime = job.updates[0].updateTime
+      } else {
+        updateTime = job.updates[0].updateDay
+      }
       for (const update of job.updates) {
         if (update.updateType === updateTypes.ACCEPT_OFFER) {
           hasAcceptOffer = true

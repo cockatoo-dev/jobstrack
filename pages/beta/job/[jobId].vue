@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
   const route = useRoute()
+  const showLoadError = ref(false)
   const showMobileOptions = ref(false)
   const showEditJob = ref(false)
   const remindLoading = ref(false)
@@ -34,6 +35,8 @@
   watch(error, async () => {
     if (error.value?.status === 403) {
       await navigateTo("/beta/login")
+    } else if (error.value) {
+      showLoadError.value = true
     }
   })
 
@@ -359,7 +362,7 @@
         </div>
       </div>
       
-      <DataLoadingError v-else-if="error" />
+      <DataLoadingError v-else-if="showLoadError" />
       <DataLoading v-else />
     </main>
 
