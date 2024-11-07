@@ -9,6 +9,12 @@ export class db {
   private _db: DrizzleD1Database<typeof schema>
 
   constructor (e: H3Event) {
+    if (!e.context.cloudflare.env.CF_DB) {
+      throw createError({
+        status: 500,
+        message: "Unable to connect to database."
+      })
+    }
     const d1 = e.context.cloudflare.env.CF_DB as unknown as D1Database
     this._db = drizzle(d1, {schema})
     // const sqlite = new Database(process.cwd() + "/localdb.db")
