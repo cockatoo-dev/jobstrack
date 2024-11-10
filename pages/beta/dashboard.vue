@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+  useHead({title: "Dashboard | JobsTrack"})
+  
   const showAddJob = ref(false)
   const showJobLimit = ref(false)
   const showLoadError = ref(false)

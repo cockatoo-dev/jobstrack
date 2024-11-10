@@ -1,5 +1,7 @@
 <script setup lang="ts">
   import { FetchError } from 'ofetch'
+
+  useHead({title: "Delete Account | JobsTrack"})
   
   const pass = ref("")
   const formLoading = ref(false)

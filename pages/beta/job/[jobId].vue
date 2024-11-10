@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  useHead({title: "Job Information | JobsTrack"})
 
   const route = useRoute()
   const showLoadError = ref(false)
