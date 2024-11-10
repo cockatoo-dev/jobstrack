@@ -1,5 +1,11 @@
 <script setup lang="ts">
-
+  useHead({title: "JobsTrack"})
+  useSeoMeta({
+    title: "JobsTrack",
+    ogTitle: "JobsTrack",
+    description: "A site to help you track your job applications.",
+    ogDescription: "A site to help you track your job applications."
+  })
 </script>
 
 <template>

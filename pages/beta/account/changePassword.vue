@@ -1,5 +1,7 @@
 <script setup lang="ts">
   import { FetchError } from 'ofetch'
+
+  useHead({title: "Change Password | JobsTrack"})
   
   const oldPass = ref("")
   const newPass = ref("")

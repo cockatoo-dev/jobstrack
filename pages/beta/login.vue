@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import { FetchError } from "ofetch"
   
+  useHead({title: "Login | JobsTrack"})
+  
   const loginUname = ref("")
   const loginPass = ref("")
   const createUname = ref("")
@@ -59,7 +61,7 @@
       }
     }
   }
-
+  
   onMounted(async () => {
     try {
       const result = await $fetch("/api/beta/auth/tokenCheck", {method: "get"})
@@ -69,7 +71,6 @@
     } catch {
       return
     }
-    
   })
 </script>
 
@@ -77,10 +78,7 @@
   <div>
     <LoggedOutNavbar beta />
     <main class="p-4 mx-auto sm:w-[40rem]">
-      <Tabs 
-        value="login"
-        class="w-full"
-      >
+      <Tabs value="login" class="w-full">
         <TabList>
           <Tab value="login">Log In</Tab>
           <Tab value="create">Create Account</Tab>
