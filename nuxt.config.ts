@@ -29,6 +29,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@primevue/nuxt-module'
   ],
+  css: ['~/assets/css/tailwind.css'],
   googleFonts: {
     families: {
       "Open Sans": [400, 700]
