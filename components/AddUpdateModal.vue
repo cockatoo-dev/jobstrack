@@ -1,6 +1,5 @@
 <script setup lang="ts">
   import { FetchError } from 'ofetch'
-  import { DAY } from "#imports"
   
   const isVisible = defineModel<boolean>()
   const props = defineProps<{
