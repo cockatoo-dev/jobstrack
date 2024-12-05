@@ -1,6 +1,4 @@
 <script setup lang="ts">
-  import { updateTypes } from '#imports';
-  
   const props = defineProps<{
     beta?: boolean
     timestamp: number

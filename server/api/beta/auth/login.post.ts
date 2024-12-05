@@ -1,6 +1,5 @@
 import { z } from "zod"
 import { useDB } from "../../../db/db"
-import { createBetaToken, hashPassword, TOKEN_COOKIE, TOKEN_EXPIRY } from "../../../utils/serverUtils"
 
 const bodySchema = z.object({
   uname: z.string(),
