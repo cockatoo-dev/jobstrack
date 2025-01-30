@@ -4,7 +4,7 @@
       JobsTrack | Check out the project's 
       <NuxtLink 
         class="text-fuchsia-500 hover:underline" 
-        to="https://github.com/max8539/jobstrack"
+        to="https://github.com/cockatoo-dev/jobstrack"
         target="_blank"
       >
         Github page.
@@ -14,7 +14,7 @@
       Got a suggestion? Head over to the 
       <NuxtLink 
         class="text-fuchsia-500 hover:underline"
-        to="https://github.com/max8539/jobstrack/issues"
+        to="https://github.com/cockatoo-dev/jobstrack/issues"
         target="_blank"
       >
         issues page.
